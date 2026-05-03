@@ -6,6 +6,8 @@ import { marketCategories } from "../../../../lib/market-utils";
 
 type GameBoardSearchParams = {
   category?: string;
+  q?: string;
+  server?: string;
   status?: string;
   tradeType?: string;
 };
@@ -75,6 +77,8 @@ export default async function GameBoardPage({
             games={games}
             initialCategory={resolvedSearchParams.category}
             initialGame={game.name}
+            initialKeyword={resolvedSearchParams.q}
+            initialServer={resolvedSearchParams.server}
             initialStatus={resolvedSearchParams.status}
             initialTradeType={resolvedSearchParams.tradeType}
             posts={posts}

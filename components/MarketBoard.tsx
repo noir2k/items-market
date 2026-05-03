@@ -40,6 +40,8 @@ export function MarketBoard({
   games,
   initialCategory,
   initialGame,
+  initialKeyword,
+  initialServer,
   initialStatus,
   initialTradeType,
   posts
@@ -48,6 +50,8 @@ export function MarketBoard({
   games: BoardGame[];
   initialCategory?: string;
   initialGame?: string;
+  initialKeyword?: string;
+  initialServer?: string;
   initialStatus?: string;
   initialTradeType?: string;
   posts: MarketPost[];
@@ -64,11 +68,15 @@ export function MarketBoard({
   const [category, setCategoryState] = useState(
     categories.includes(initialCategory || "") ? initialCategory || "all" : "all"
   );
+  const keyword = (initialKeyword || "").trim();
+  const server = (initialServer || "").trim();
 
   const filteredPosts = filterMarketPosts({
     category,
     game,
+    keyword,
     posts,
+    server,
     status,
     tradeType
   });
@@ -103,6 +111,8 @@ export function MarketBoard({
     if (next.tradeType && next.tradeType !== "all") params.set("tradeType", next.tradeType);
     if (next.category && next.category !== "all") params.set("category", next.category);
     if (next.status && next.status !== "all") params.set("status", next.status);
+    if (keyword) params.set("q", keyword);
+    if (server) params.set("server", server);
 
     const query = params.toString();
     const gameSlug = gameStats.find((item) => item.game === next.game)?.slug;
@@ -116,6 +126,8 @@ export function MarketBoard({
     if (tradeType !== "all") params.set("tradeType", tradeType);
     if (category !== "all") params.set("category", category);
     if (status !== "all") params.set("status", status);
+    if (keyword) params.set("q", keyword);
+    if (server) params.set("server", server);
 
     const query = params.toString();
     const gameSlug = gameStats.find((item) => item.game === nextGame)?.slug;
@@ -207,6 +219,16 @@ export function MarketBoard({
               <strong>거래완료 {selectedSummary.closedCount}</strong>
             </div>
           </div>
+
+          {(keyword || server) ? (
+            <div className="board-active-filters">
+              {keyword ? <span className="chip chip--muted">검색어: {keyword}</span> : null}
+              {server ? <span className="chip chip--muted">서버: {server}</span> : null}
+              <Link className="text-link" href="/market">
+                전체 조건 초기화
+              </Link>
+            </div>
+          ) : null}
         </section>
 
         <section className="filter-panel">

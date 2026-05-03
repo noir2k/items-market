@@ -203,7 +203,9 @@ export function getGameNameBySlug(posts: MarketPost[] = [], slug: string): strin
 interface FilterMarketPostsArgs {
   category?: string;
   game?: string;
+  keyword?: string;
   posts?: MarketPost[];
+  server?: string;
   status?: MarketStatus | "all";
   tradeType?: TradeType | "all";
 }
@@ -211,10 +213,15 @@ interface FilterMarketPostsArgs {
 export function filterMarketPosts({
   category = "all",
   game = "all",
+  keyword = "",
   posts = [],
+  server = "",
   status = "all",
   tradeType = "all"
 }: FilterMarketPostsArgs): MarketPost[] {
+  const normalizedKeyword = keyword.trim().toLowerCase();
+  const normalizedServer = server.trim().toLowerCase();
+
   return posts.filter((post) => {
     if (tradeType !== "all" && post.tradeType !== tradeType) {
       return false;
@@ -230,6 +237,19 @@ export function filterMarketPosts({
 
     if (category !== "all" && post.category !== category) {
       return false;
+    }
+
+    if (normalizedKeyword) {
+      const haystack = `${post.title || ""} ${post.game || ""} ${post.content || ""}`.toLowerCase();
+      if (!haystack.includes(normalizedKeyword)) {
+        return false;
+      }
+    }
+
+    if (normalizedServer) {
+      if ((post.server || "").toLowerCase() !== normalizedServer) {
+        return false;
+      }
     }
 
     return true;

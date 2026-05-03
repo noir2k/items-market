@@ -10,6 +10,8 @@ export const metadata = {
 type MarketSearchParams = {
   category?: string;
   game?: string;
+  q?: string;
+  server?: string;
   status?: string;
   tradeType?: string;
 };
@@ -49,6 +51,8 @@ export default async function MarketPage({
             games={games}
             initialCategory={resolvedSearchParams.category}
             initialGame={resolvedSearchParams.game}
+            initialKeyword={resolvedSearchParams.q}
+            initialServer={resolvedSearchParams.server}
             initialStatus={resolvedSearchParams.status}
             initialTradeType={resolvedSearchParams.tradeType}
             posts={posts}

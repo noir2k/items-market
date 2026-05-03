@@ -124,6 +124,30 @@ describe("market helpers", () => {
     expect(result.map((post) => post.id)).toEqual(["a"]);
   });
 
+  it("filters by keyword across title/game/content (case insensitive)", () => {
+    const result = filterMarketPosts({
+      keyword: "메소",
+      posts: [
+        { id: "a", category: "게임머니", commentCount: 0, comments: [], game: "메이플스토리", status: "open", title: "메소 50억", tradeType: "sell" },
+        { id: "b", category: "아이템", commentCount: 0, comments: [], content: "장비 거래입니다", game: "로스트아크", status: "open", title: "전설 카드", tradeType: "buy" }
+      ]
+    });
+
+    expect(result.map((post) => post.id)).toEqual(["a"]);
+  });
+
+  it("filters by exact server match (case insensitive)", () => {
+    const result = filterMarketPosts({
+      posts: [
+        { id: "a", category: "게임머니", commentCount: 0, comments: [], game: "메이플스토리", server: "스카니아", status: "open", tradeType: "sell" },
+        { id: "b", category: "게임머니", commentCount: 0, comments: [], game: "메이플스토리", server: "루나", status: "open", tradeType: "sell" }
+      ],
+      server: "스카니아"
+    });
+
+    expect(result.map((post) => post.id)).toEqual(["a"]);
+  });
+
   it("returns summary counts for posts and comments", () => {
     const summary = getMarketSummary([
       { id: "a", commentCount: 2, comments: [{ id: "1" }, { id: "2" }], status: "open", tradeType: "sell" },
