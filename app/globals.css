@@ -818,8 +818,21 @@ label,
 }
 
 .board-toolbar--admin {
-  /* Admin export form has two visible cells: a select and a button group. */
-  grid-template-columns: minmax(220px, 1fr) auto;
+  /* Admin export form: month select on the left, buttons hugging the right edge. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 14px 24px;
+  grid-template-columns: none;
+}
+
+.board-toolbar--admin > .field {
+  flex: 1 1 220px;
+  max-width: 320px;
+}
+
+.board-toolbar--admin > .admin-filter-actions {
+  margin-left: auto;
 }
 
 .board-list-panel {
@@ -1233,8 +1246,9 @@ label,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .board-toolbar--admin {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .board-toolbar--admin > .field {
+    flex: 1 1 100%;
+    max-width: none;
   }
 
   .seller-card {
