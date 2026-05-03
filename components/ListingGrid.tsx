@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getStatusLabel, getTradeTypeLabel } from "../lib/market-utils";
+import { getGameTagClass, getStatusLabel, getTradeTypeLabel } from "../lib/market-utils";
 import type { MarketPost } from "../lib/types";
 
 function BadgeList({ badges }: { badges: string[] }) {
@@ -36,7 +36,9 @@ export function ListingGrid({ items }: { items: MarketPost[] }) {
             </div>
           </div>
           <div className="listing-meta">
-            {item.game} · {item.server} · {item.category}
+            <span className={`game-tag ${getGameTagClass(item.gameSlug)}`}>{item.game}</span>
+            {" · "}
+            {item.server} · {item.category}
           </div>
           <p className="muted">{item.summary}</p>
           <div className="listing-card__bottom">

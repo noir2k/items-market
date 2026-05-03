@@ -195,6 +195,11 @@ export function mapMarketPostRecord(record: MarketPostRecord, now: Date = new Da
   };
 }
 
+export function getGameTagClass(slug: string | null | undefined): string {
+  if (!slug) return "";
+  return `game-tag--${slug}`;
+}
+
 export function getMarketGames(posts: MarketPost[]): string[] {
   return Array.from(new Set(posts.map((post) => post.game)));
 }

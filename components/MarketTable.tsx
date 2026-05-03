@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getStatusLabel, getTradeTypeLabel } from "../lib/market-utils";
+import { getGameTagClass, getStatusLabel, getTradeTypeLabel } from "../lib/market-utils";
 import type { MarketPost } from "../lib/types";
 
 export function MarketTable({ items }: { items: MarketPost[] }) {
@@ -20,7 +20,9 @@ export function MarketTable({ items }: { items: MarketPost[] }) {
               <Link href={`/market/${item.id}`}>{item.title}</Link>
             </strong>
             <div className="market-table__meta">
-              {item.game} · {item.server} · {item.category} · {item.quantity}
+              <span className={`game-tag ${getGameTagClass(item.gameSlug)}`}>{item.game}</span>
+              {" · "}
+              {item.server} · {item.category} · {item.quantity}
             </div>
           </div>
           <span className={`market-table__pill market-table__pill--${item.tradeType}`}>

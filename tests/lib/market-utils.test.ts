@@ -5,6 +5,7 @@ import {
   getCategoryCode,
   getGameNameBySlug,
   getGameStats,
+  getGameTagClass,
   getMarketSummary,
   getTradeTypeLabel,
   mapMarketPostRecord,
@@ -143,6 +144,13 @@ describe("market helpers", () => {
     expect(codes).toEqual(["all", "game_money", "item", "account", "etc"]);
     const labels = marketCategoryOptions.map((option) => option.label);
     expect(labels).toEqual(["전체", "게임머니", "아이템", "계정", "기타"]);
+  });
+
+  it("maps a game slug to the corresponding chip class", () => {
+    expect(getGameTagClass("maplestory")).toBe("game-tag--maplestory");
+    expect(getGameTagClass("fc-online")).toBe("game-tag--fc-online");
+    expect(getGameTagClass(null)).toBe("");
+    expect(getGameTagClass(undefined)).toBe("");
   });
 
   it("maps Korean labels back to canonical category codes", () => {
