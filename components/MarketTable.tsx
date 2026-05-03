@@ -23,8 +23,10 @@ export function MarketTable({ items }: { items: MarketPost[] }) {
               {item.game} · {item.server} · {item.category} · {item.quantity}
             </div>
           </div>
-          <span className="market-table__pill">{getTradeTypeLabel(item.tradeType)}</span>
-          <span className={`market-table__pill${item.status === "closed" ? " market-table__pill--muted" : ""}`}>
+          <span className={`market-table__pill market-table__pill--${item.tradeType}`}>
+            {getTradeTypeLabel(item.tradeType)}
+          </span>
+          <span className={`market-table__pill market-table__pill--status-${item.status}`}>
             {getStatusLabel(item.status)}
           </span>
           <span className="market-table__text">{item.authorName}</span>

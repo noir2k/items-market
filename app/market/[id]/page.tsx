@@ -97,10 +97,10 @@ export default async function ListingDetailPage({
                 <span className="chip">{item.game}</span>
                 <span className="chip">{item.server}</span>
                 <span className="chip">{item.category}</span>
-                <span className={`chip ${item.tradeType === "buy" ? "chip--accent" : ""}`}>
+                <span className={`chip chip--${item.tradeType}`}>
                   {getTradeTypeLabel(item.tradeType)}
                 </span>
-                <span className={`chip ${item.status === "closed" ? "chip--muted" : ""}`}>
+                <span className={`chip chip--status-${item.status}`}>
                   {getStatusLabel(item.status)}
                 </span>
               </div>

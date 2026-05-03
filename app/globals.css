@@ -522,8 +522,32 @@ label,
 }
 
 .chip--accent {
-  background: #e0f2fe;
-  color: #0f4c81;
+  /* @deprecated — use .chip--buy or .chip--sell. Retained as alias for legacy callers. */
+  background: var(--trade-buy-soft);
+  color: var(--trade-buy);
+}
+
+.chip--buy {
+  background: var(--trade-buy-soft);
+  color: var(--trade-buy);
+  font-weight: 600;
+}
+
+.chip--sell {
+  background: var(--trade-sell-soft);
+  color: var(--trade-sell);
+  font-weight: 600;
+}
+
+.chip--status-open {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--status-open);
+  font-weight: 600;
+}
+
+.chip--status-closed {
+  background: var(--surface-muted);
+  color: var(--status-closed);
 }
 
 .chip--muted {
@@ -1049,6 +1073,26 @@ label,
 .market-table__pill--muted {
   background: var(--surface-muted);
   color: var(--muted);
+}
+
+.market-table__pill--buy {
+  background: var(--trade-buy-soft);
+  color: var(--trade-buy);
+}
+
+.market-table__pill--sell {
+  background: var(--trade-sell-soft);
+  color: var(--trade-sell);
+}
+
+.market-table__pill--status-open {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--status-open);
+}
+
+.market-table__pill--status-closed {
+  background: var(--surface-muted);
+  color: var(--status-closed);
 }
 
 .market-table__text {

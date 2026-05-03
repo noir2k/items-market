@@ -27,10 +27,10 @@ export function ListingGrid({ items }: { items: MarketPost[] }) {
               </h3>
             </div>
             <div className="listing-card__chips">
-              <span className={`chip ${item.tradeType === "buy" ? "chip--accent" : ""}`}>
+              <span className={`chip chip--${item.tradeType}`}>
                 {getTradeTypeLabel(item.tradeType)}
               </span>
-              <span className={`chip ${item.status === "closed" ? "chip--muted" : ""}`}>
+              <span className={`chip chip--status-${item.status}`}>
                 {getStatusLabel(item.status)}
               </span>
             </div>
