@@ -1,0 +1,30 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Next.js dev (items-market)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "Supabase local stack",
+      "runtimeExecutable": "powershell.exe",
+      "runtimeArgs": ["-Command", "supabase start"],
+      "port": 54321
+    },
+    {
+      "name": "Supabase bootstrap (one-shot seed)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "supabase:bootstrap"],
+      "port": 0
+    },
+    {
+      "name": "Staging health check (one-shot)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "staging:check"],
+      "port": 0
+    }
+  ]
+}
