@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { MarketBoard } from "../../components/MarketBoard";
 import { listMarketGameOptions, listMarketPosts } from "../../lib/market-server";
-import { marketCategories } from "../../lib/market-utils";
 
 export const metadata = {
   title: "거래소 | ITEMMARKET"
@@ -47,7 +46,6 @@ export default async function MarketPage({
       <section className="section section--soft">
         <div className="container">
           <MarketBoard
-            categories={marketCategories}
             games={games}
             initialCategory={resolvedSearchParams.category}
             initialGame={resolvedSearchParams.game}

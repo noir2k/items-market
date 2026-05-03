@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   canManageMarketPost,
   filterMarketPosts,
+  getCategoryCode,
   getGameNameBySlug,
   getGameStats,
   getMarketSummary,
   getTradeTypeLabel,
   mapMarketPostRecord,
+  marketCategoryOptions,
   normalizePriceInput
 } from "../../lib/market-utils";
 
@@ -134,6 +136,19 @@ describe("market helpers", () => {
     });
 
     expect(result.map((post) => post.id)).toEqual(["a"]);
+  });
+
+  it("exposes category options with stable codes and Korean labels", () => {
+    const codes = marketCategoryOptions.map((option) => option.code);
+    expect(codes).toEqual(["all", "game_money", "item", "account", "etc"]);
+    const labels = marketCategoryOptions.map((option) => option.label);
+    expect(labels).toEqual(["전체", "게임머니", "아이템", "계정", "기타"]);
+  });
+
+  it("maps Korean labels back to canonical category codes", () => {
+    expect(getCategoryCode("게임머니")).toBe("game_money");
+    expect(getCategoryCode("계정")).toBe("account");
+    expect(getCategoryCode("unknown")).toBe("etc");
   });
 
   it("filters by exact server match (case insensitive)", () => {

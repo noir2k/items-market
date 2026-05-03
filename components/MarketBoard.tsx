@@ -3,7 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { filterMarketPosts, getMarketSummary } from "../lib/market-utils";
+import {
+  filterMarketPosts,
+  getCategoryCode,
+  getMarketSummary,
+  marketCategoryOptions,
+  type MarketCategoryFilterCode
+} from "../lib/market-utils";
 import type { MarketPost, MarketStatus, TradeType } from "../lib/types";
 import { MarketTable } from "./MarketTable";
 
@@ -35,8 +41,11 @@ function SummaryCard({ label, value }: { label: string; value: number }) {
   );
 }
 
+function isMarketCategoryFilterCode(value: string | undefined): value is MarketCategoryFilterCode {
+  return marketCategoryOptions.some((option) => option.code === value);
+}
+
 export function MarketBoard({
-  categories,
   games,
   initialCategory,
   initialGame,
@@ -46,7 +55,6 @@ export function MarketBoard({
   initialTradeType,
   posts
 }: {
-  categories: readonly string[];
   games: BoardGame[];
   initialCategory?: string;
   initialGame?: string;
@@ -65,14 +73,14 @@ export function MarketBoard({
   const [status, setStatusState] = useState<StatusFilter>(
     initialStatus === "open" || initialStatus === "closed" ? initialStatus : "all"
   );
-  const [category, setCategoryState] = useState(
-    categories.includes(initialCategory || "") ? initialCategory || "all" : "all"
+  const [category, setCategoryState] = useState<MarketCategoryFilterCode>(
+    isMarketCategoryFilterCode(initialCategory) ? initialCategory : "all"
   );
   const keyword = (initialKeyword || "").trim();
   const server = (initialServer || "").trim();
 
   const filteredPosts = filterMarketPosts({
-    category,
+    category: category === "all" ? "all" : marketCategoryOptions.find((option) => option.code === category)?.label ?? "all",
     game,
     keyword,
     posts,
@@ -94,7 +102,7 @@ export function MarketBoard({
       : `${game} 안의 삽니다 / 팝니다 게시글을 일반 게시판 목록으로 확인합니다.`;
 
   function updateBoardUrl(nextFilters: {
-    category?: string;
+    category?: MarketCategoryFilterCode;
     game?: string;
     status?: StatusFilter;
     tradeType?: TradeTypeFilter;
@@ -151,7 +159,7 @@ export function MarketBoard({
     updateBoardUrl({ status: nextStatus });
   }
 
-  function setCategory(nextCategory: string) {
+  function setCategory(nextCategory: MarketCategoryFilterCode) {
     setCategoryState(nextCategory);
     updateBoardUrl({ category: nextCategory });
   }
@@ -263,10 +271,13 @@ export function MarketBoard({
 
             <label className="field">
               <span>카테고리</span>
-              <select onChange={(event) => setCategory(event.target.value)} value={category}>
-                {categories.map((item) => (
-                  <option key={item} value={item === "전체" ? "all" : item}>
-                    {item}
+              <select
+                onChange={(event) => setCategory(event.target.value as MarketCategoryFilterCode)}
+                value={category}
+              >
+                {marketCategoryOptions.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {option.label}
                   </option>
                 ))}
               </select>

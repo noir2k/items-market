@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MarketBoard } from "../../../../components/MarketBoard";
 import { listMarketGameOptions, listMarketPosts } from "../../../../lib/market-server";
-import { marketCategories } from "../../../../lib/market-utils";
 
 type GameBoardSearchParams = {
   category?: string;
@@ -73,7 +72,6 @@ export default async function GameBoardPage({
       <section className="section section--soft">
         <div className="container">
           <MarketBoard
-            categories={marketCategories}
             games={games}
             initialCategory={resolvedSearchParams.category}
             initialGame={game.name}

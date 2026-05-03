@@ -9,7 +9,18 @@ import type {
   TradeType
 } from "./types";
 
-export const marketCategories = ["전체", "게임머니", "아이템", "계정", "기타"] as const;
+export const marketCategoryOptions = [
+  { code: "all", label: "전체" },
+  { code: "game_money", label: "게임머니" },
+  { code: "item", label: "아이템" },
+  { code: "account", label: "계정" },
+  { code: "etc", label: "기타" }
+] as const;
+
+export type MarketCategoryFilterCode = (typeof marketCategoryOptions)[number]["code"];
+
+/** @deprecated use marketCategoryOptions instead — retained for legacy callers */
+export const marketCategories = marketCategoryOptions.map((option) => option.label);
 
 const categoryLabelMap: Record<MarketCategoryCode, string> = {
   account: "계정",
