@@ -1,7 +1,15 @@
-import type { Profile } from "./types";
+import type { AppRole, MemberStatus, Profile } from "./types";
 
 export function isAdminProfile(profile: Profile | null | undefined): boolean {
   return Boolean(profile && profile.role === "admin" && profile.status === "active");
+}
+
+export function getRoleLabel(role: AppRole | null | undefined): string {
+  return role === "admin" ? "관리자" : "일반회원";
+}
+
+export function getMemberStatusLabel(status: MemberStatus | null | undefined): string {
+  return status === "suspended" ? "정지" : "활성";
 }
 
 export function sanitizeRedirectPath(path: string | null | undefined): string | null {

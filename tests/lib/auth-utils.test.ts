@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  getMemberStatusLabel,
   getPostLoginPath,
+  getRoleLabel,
   isAdminProfile,
   sanitizeRedirectPath
 } from "../../lib/auth-utils";
@@ -20,6 +22,22 @@ describe("sanitizeRedirectPath", () => {
     expect(sanitizeRedirectPath("https://evil.example")).toBe(null);
     expect(sanitizeRedirectPath("//evil.example")).toBe(null);
     expect(sanitizeRedirectPath("market")).toBe(null);
+  });
+});
+
+describe("getRoleLabel", () => {
+  it("localizes role codes", () => {
+    expect(getRoleLabel("admin")).toBe("관리자");
+    expect(getRoleLabel("member")).toBe("일반회원");
+    expect(getRoleLabel(undefined)).toBe("일반회원");
+  });
+});
+
+describe("getMemberStatusLabel", () => {
+  it("localizes status codes", () => {
+    expect(getMemberStatusLabel("active")).toBe("활성");
+    expect(getMemberStatusLabel("suspended")).toBe("정지");
+    expect(getMemberStatusLabel(undefined)).toBe("활성");
   });
 });
 

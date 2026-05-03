@@ -4,6 +4,7 @@ import { MarketTable } from "../../components/MarketTable";
 import { signOutAction } from "../auth/actions";
 import { listPostsByAuthor } from "../../lib/market-server";
 import { getMarketSummary } from "../../lib/market-utils";
+import { getMemberStatusLabel, getRoleLabel } from "../../lib/auth-utils";
 import { getCurrentProfile } from "../../lib/supabase/server";
 
 export const metadata = {
@@ -72,11 +73,11 @@ export default async function MyPage({
               </div>
               <div>
                 <strong>권한</strong>
-                <p>{profile.role}</p>
+                <p>{getRoleLabel(profile.role)}</p>
               </div>
               <div>
                 <strong>상태</strong>
-                <p>{profile.status}</p>
+                <p>{getMemberStatusLabel(profile.status)}</p>
               </div>
             </div>
 

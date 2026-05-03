@@ -9,7 +9,7 @@ import {
 import { formatMonthOption } from "../../lib/admin-utils";
 import { getAdminDashboardData } from "../../lib/admin-server";
 import { getStatusLabel, getTradeTypeLabel } from "../../lib/market-utils";
-import { isAdminProfile } from "../../lib/auth-utils";
+import { getMemberStatusLabel, getRoleLabel, isAdminProfile } from "../../lib/auth-utils";
 import { getCurrentProfile } from "../../lib/supabase/server";
 
 export const metadata = {
@@ -93,11 +93,11 @@ export default async function AdminPage({
               </div>
               <div>
                 <strong>권한</strong>
-                <p>{profile.role}</p>
+                <p>{getRoleLabel(profile.role)}</p>
               </div>
               <div>
                 <strong>상태</strong>
-                <p>{profile.status}</p>
+                <p>{getMemberStatusLabel(profile.status)}</p>
               </div>
             </div>
 
@@ -148,7 +148,7 @@ export default async function AdminPage({
                         <Link href={`/admin?memberId=${encodeURIComponent(member.id)}`}>{member.nickname}</Link>
                       </strong>
                       <div className="market-table__meta">
-                        {member.email} · {member.role} · 상태 {member.status}
+                        {member.email} · {getRoleLabel(member.role)} · 상태 {getMemberStatusLabel(member.status)}
                       </div>
                     </div>
                     <div className="seller-stats">
@@ -249,7 +249,7 @@ export default async function AdminPage({
                     <div>
                       <strong>회원 상태</strong>
                       <p>
-                        {dashboard.selectedMember.role} · {dashboard.selectedMember.status}
+                        {getRoleLabel(dashboard.selectedMember.role)} · {getMemberStatusLabel(dashboard.selectedMember.status)}
                       </p>
                     </div>
                   </div>
