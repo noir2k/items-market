@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ListingGrid } from "../components/ListingGrid";
 import { HeroSearchCard } from "../components/HeroSearchCard";
-import { listFeaturedMarketPosts } from "../lib/market-server";
+import { getMarketStats, listFeaturedMarketPosts } from "../lib/market-server";
 
 const categories = [
   {
@@ -40,7 +40,11 @@ const safetyItems = [
 ];
 
 export default async function HomePage() {
-  const featuredListings = await listFeaturedMarketPosts();
+  const [featuredListings, stats] = await Promise.all([
+    listFeaturedMarketPosts(),
+    getMarketStats()
+  ]);
+  const numberFormatter = new Intl.NumberFormat("ko-KR");
 
   return (
     <main>
@@ -76,16 +80,16 @@ export default async function HomePage() {
 
             <div className="hero__stats">
               <div className="stat">
-                <strong>1,248</strong>
-                <span>실시간 등록 물품</span>
+                <strong>{numberFormatter.format(stats.openCount)}</strong>
+                <span>거래중 물품</span>
               </div>
               <div className="stat">
-                <strong>326</strong>
+                <strong>{numberFormatter.format(stats.totalCount)}</strong>
+                <span>전체 등록 물품</span>
+              </div>
+              <div className="stat">
+                <strong>{numberFormatter.format(stats.closedTodayCount)}</strong>
                 <span>오늘 완료 거래</span>
-              </div>
-              <div className="stat">
-                <strong>24H</strong>
-                <span>안전거래 지원</span>
               </div>
             </div>
 

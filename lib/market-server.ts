@@ -184,6 +184,32 @@ export async function listMarketGameOptions(): Promise<MarketGameOption[]> {
   return (data ?? []) as MarketGameOption[];
 }
 
+export async function getMarketStats(): Promise<{
+  closedTodayCount: number;
+  openCount: number;
+  totalCount: number;
+}> {
+  const supabase = await createClient();
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const [openResult, totalResult, closedResult] = await Promise.all([
+    supabase.from("market_posts").select("id", { count: "exact", head: true }).eq("status", "open"),
+    supabase.from("market_posts").select("id", { count: "exact", head: true }),
+    supabase
+      .from("market_posts")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "closed")
+      .gte("closed_at", startOfDay.toISOString())
+  ]);
+
+  return {
+    closedTodayCount: closedResult.count ?? 0,
+    openCount: openResult.count ?? 0,
+    totalCount: totalResult.count ?? 0
+  };
+}
+
 export async function getMarketPostFormValues(id: string): Promise<MarketPostFormValues | null> {
   const numericId = parsePostId(id);
 
