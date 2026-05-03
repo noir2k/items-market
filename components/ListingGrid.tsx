@@ -21,7 +21,7 @@ export function ListingGrid({ items }: { items: MarketPost[] }) {
         <article className="listing-card" key={item.id}>
           <div className="listing-card__top">
             <div>
-              <BadgeList badges={item.badges} />
+              <BadgeList badges={item.badges ?? []} />
               <h3>
                 <Link href={`/market/${item.id}`}>{item.title}</Link>
               </h3>

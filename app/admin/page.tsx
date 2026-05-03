@@ -37,7 +37,7 @@ export default async function AdminPage({
 }) {
   const { profile, user } = await getCurrentProfile();
 
-  if (!user || !isAdminProfile(profile)) {
+  if (!user || !profile || !isAdminProfile(profile)) {
     redirect("/admin/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
   }
 

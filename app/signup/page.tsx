@@ -8,7 +8,11 @@ export const metadata = {
   title: "회원가입 | ITEMMARKET"
 };
 
-export default async function SignupPage({ searchParams }) {
+export default async function SignupPage({
+  searchParams
+}: {
+  searchParams: Promise<{ error?: string; message?: string }>;
+}) {
   const session = await getCurrentSession();
 
   if (session) {

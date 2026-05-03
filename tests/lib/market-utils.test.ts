@@ -165,8 +165,8 @@ describe("market helpers", () => {
 
   it("returns summary counts for posts and comments", () => {
     const summary = getMarketSummary([
-      { id: "a", commentCount: 2, comments: [{ id: "1" }, { id: "2" }], status: "open", tradeType: "sell" },
-      { id: "b", commentCount: 0, comments: [], status: "closed", tradeType: "buy" }
+      { id: "a", category: "게임머니", commentCount: 2, comments: [{ id: "1" }, { id: "2" }], game: "메이플스토리", status: "open", tradeType: "sell" },
+      { id: "b", category: "아이템", commentCount: 0, comments: [], game: "로스트아크", status: "closed", tradeType: "buy" }
     ]);
 
     expect(summary).toEqual({
@@ -185,7 +185,7 @@ describe("market helpers", () => {
   });
 
   it("keeps game slugs available for independent board routes", () => {
-    const posts = [
+    const posts: import("../../lib/types").MarketPost[] = [
       { id: "a", category: "게임머니", commentCount: 0, comments: [], game: "메이플스토리", gameSlug: "maplestory", status: "open", tradeType: "sell" },
       { id: "b", category: "계정", commentCount: 0, comments: [], game: "FC Online", gameSlug: "fc-online", status: "open", tradeType: "buy" }
     ];

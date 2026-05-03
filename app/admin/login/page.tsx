@@ -10,7 +10,11 @@ export const metadata = {
   title: "관리자 로그인 | ITEMMARKET"
 };
 
-export default async function AdminLoginPage({ searchParams }) {
+export default async function AdminLoginPage({
+  searchParams
+}: {
+  searchParams: Promise<{ error?: string; message?: string; next?: string }>;
+}) {
   const params = await searchParams;
   const { profile, user } = await getCurrentProfile();
   const nextPath = sanitizeRedirectPath(params?.next);

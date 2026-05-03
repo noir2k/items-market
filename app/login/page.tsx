@@ -10,7 +10,11 @@ export const metadata = {
   title: "로그인 | ITEMMARKET"
 };
 
-export default async function LoginPage({ searchParams }) {
+export default async function LoginPage({
+  searchParams
+}: {
+  searchParams: Promise<{ error?: string; message?: string; next?: string }>;
+}) {
   const params = await searchParams;
   const session = await getCurrentSession();
   const nextPath = sanitizeRedirectPath(params?.next);

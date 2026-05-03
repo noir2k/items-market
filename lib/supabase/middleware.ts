@@ -1,9 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { isAdminProfile } from "../auth-utils";
 import { getProtectedRouteRedirect } from "../navigation-utils";
+import type { Profile } from "../types";
 
-export async function updateSession(request) {
+export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request
   });
@@ -33,7 +34,7 @@ export async function updateSession(request) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  let profile = null;
+  let profile: Profile | null = null;
 
   if (user) {
     const { data } = await supabase
@@ -42,7 +43,7 @@ export async function updateSession(request) {
       .eq("id", user.id)
       .single();
 
-    profile = data;
+    profile = (data as Profile | null) ?? null;
   }
 
   const redirectPath = getProtectedRouteRedirect({

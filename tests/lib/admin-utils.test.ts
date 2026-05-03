@@ -5,8 +5,9 @@ import {
   formatMonthOption,
   getAdminSummary
 } from "../../lib/admin-utils";
+import type { MarketPost } from "../../lib/types";
 
-const posts = [
+const posts: MarketPost[] = [
   {
     authorName: "member_a",
     category: "게임머니",
@@ -20,7 +21,8 @@ const posts = [
     status: "open",
     title: "스카니아 메소 120억 분할 판매",
     tradeType: "sell",
-    updatedAtIso: "2026-04-05T11:30:00.000Z"
+    updatedAtIso: "2026-04-05T11:30:00.000Z",
+    comments: []
   },
   {
     authorName: "member_a",
@@ -35,9 +37,10 @@ const posts = [
     status: "closed",
     title: "로스트아크 전설 카드 선택팩 삽니다",
     tradeType: "buy",
-    updatedAtIso: "2026-03-15T12:00:00.000Z"
+    updatedAtIso: "2026-03-15T12:00:00.000Z",
+    comments: []
   }
-] as const;
+];
 
 describe("filterPostsByMonth", () => {
   it("keeps only posts created in the requested month", () => {

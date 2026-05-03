@@ -1,21 +1,23 @@
 "use server";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getPostLoginPath, isAdminProfile, sanitizeRedirectPath } from "../../lib/auth-utils";
 import { createClient } from "../../lib/supabase/server";
+import type { Profile } from "../../lib/types";
 
-async function loadProfile(supabase, userId) {
+async function loadProfile(supabase: SupabaseClient, userId: string): Promise<Profile | null> {
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, email, nickname, role, status")
     .eq("id", userId)
     .single();
 
-  return profile;
+  return (profile as Profile | null) ?? null;
 }
 
-export async function signInAction(formData) {
+export async function signInAction(formData: FormData) {
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
   const nextPath = sanitizeRedirectPath(String(formData.get("next") || ""));
@@ -47,7 +49,7 @@ export async function signInAction(formData) {
   redirect(getPostLoginPath({ isAdminLogin, nextPath, profile }));
 }
 
-export async function signUpAction(formData) {
+export async function signUpAction(formData: FormData) {
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
   const nickname = String(formData.get("nickname") || "").trim();
