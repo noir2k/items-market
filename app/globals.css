@@ -1,4 +1,5 @@
 :root {
+  /* Surfaces */
   --bg: #f5f7fb;
   --surface: #ffffff;
   --surface-muted: #eef2f8;
@@ -6,13 +7,72 @@
   --line: #dbe3ee;
   --text: #1b2430;
   --muted: #667085;
+
+  /* Brand */
   --primary: #2563eb;
   --primary-soft: #e8f0ff;
   --accent: #0f172a;
+
+  /* Trade type — 삽니다(buy)는 초록(수요/매수), 팝니다(sell)는 파랑(공급/매도) */
+  --trade-buy: #16a34a;
+  --trade-buy-soft: #dcfce7;
+  --trade-sell: #2563eb;
+  --trade-sell-soft: #dbeafe;
+
+  /* Status */
+  --status-open: #16a34a;
+  --status-closed: #94a3b8;
+
+  /* Game brand colors */
+  --game-maple: #ff9800;
+  --game-lineage: #5b21b6;
+  --game-fc: #0ea5e9;
+  --game-lostark: #b91c1c;
+  --game-dnf: #f59e0b;
+  --game-aion: #06b6d4;
+
+  /* Risk / Trust */
+  --warn: #f59e0b;
+  --danger: #dc2626;
+  --trust-verified: #2563eb;
+
+  /* Shadows */
   --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-  --radius-lg: 28px;
-  --radius-md: 18px;
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-popup: 0 24px 56px rgba(15, 23, 42, 0.18);
+
+  /* Radii */
   --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  /* Spacing scale (4-base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* Breakpoints (참조용 — media query 안에서는 직접 px 사용) */
+  --bp-sm: 480px;
+  --bp-md: 720px;
+  --bp-lg: 960px;
+  --bp-xl: 1180px;
+
+  /* Layout */
   --container: 1180px;
 }
 
