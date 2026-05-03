@@ -148,8 +148,21 @@ export async function listFeaturedMarketPosts(limit = 3): Promise<MarketPost[]> 
 }
 
 export async function getMarketPostById(id: string): Promise<MarketPost | null> {
+  const numericId = parsePostId(id);
+
+  if (!numericId) {
+    return null;
+  }
+
   const posts = await runPostQuery(MARKET_POST_DETAIL_SELECT, { postId: id });
-  return posts[0] ?? null;
+  const post = posts[0] ?? null;
+
+  if (post) {
+    const supabase = await createClient();
+    await supabase.rpc("increment_market_post_view", { p_post_id: numericId });
+  }
+
+  return post;
 }
 
 export async function listPostsByAuthor(authorId: string): Promise<MarketPost[]> {
