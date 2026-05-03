@@ -997,11 +997,19 @@ label,
 
 .admin-list__row {
   display: grid;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px 24px;
   padding: 20px 24px;
   border: 1px solid rgba(219, 227, 238, 0.95);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.95);
+}
+
+@media (max-width: 720px) {
+  .admin-list__row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .admin-list__row--active {
