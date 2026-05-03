@@ -157,7 +157,9 @@ export default async function AdminPage({
                       <span>완료 {member.closedPostCount}</span>
                     </div>
                     <div className="admin-actions">
-                      {member.status === "active" ? (
+                      {member.id === user.id ? (
+                        <span className="muted">본인 계정</span>
+                      ) : member.status === "active" ? (
                         <form action={updateMemberStatusAction.bind(null, member.id, "suspended")}>
                           <button className="button button--light" type="submit">
                             회원 정지
