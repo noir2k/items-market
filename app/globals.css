@@ -1029,12 +1029,15 @@ label,
 
 .admin-list {
   display: grid;
+  /* main: 1fr, stats: chip이 2-3개씩 wrap되도록 ~220px, actions: content fit */
+  grid-template-columns: minmax(280px, 1fr) minmax(160px, 220px) max-content;
   gap: 14px;
 }
 
 .admin-list__row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
   align-items: center;
   gap: 14px 24px;
   padding: 20px 24px;
@@ -1044,6 +1047,10 @@ label,
 }
 
 @media (max-width: 720px) {
+  .admin-list {
+    grid-template-columns: 1fr;
+  }
+
   .admin-list__row {
     grid-template-columns: 1fr;
   }
