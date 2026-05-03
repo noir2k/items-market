@@ -256,7 +256,7 @@ export default async function AdminPage({
                     </div>
                   </div>
 
-                  <form action="/admin" className="board-toolbar">
+                  <form action="/admin" className="board-toolbar board-toolbar--admin">
                     <input name="memberId" type="hidden" value={dashboard.selectedMember.id} />
                     <label className="field">
                       <span>조회 월</span>
