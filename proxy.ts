@@ -5,6 +5,14 @@ export async function proxy(request: NextRequest) {
   return updateSession(request);
 }
 
+// Restrict middleware to protected routes only — public pages (`/`, `/market`,
+// `/guide`, etc.) skip the supabase session lookup entirely.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"]
+  matcher: [
+    "/admin/:path*",
+    "/mypage/:path*",
+    "/sell",
+    "/buy",
+    "/market/:id/edit"
+  ]
 };
