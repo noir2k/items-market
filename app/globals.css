@@ -361,6 +361,19 @@ label,
   padding: 28px;
 }
 
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel > .section-heading,
+.panel > .section-heading--compact {
+  /* section-heading already provides its own margin-bottom; rely on the
+     panel's gap instead so spacing stays uniform between siblings. */
+  margin-bottom: 0;
+}
+
 .search-panel h2 {
   margin: 18px 0 20px;
   font-size: 1.5rem;
