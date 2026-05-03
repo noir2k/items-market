@@ -1,5 +1,23 @@
 import { createClient } from "@supabase/supabase-js";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { parseEnvFile } from "../lib/env-file";
 import { buildDemoMarketSeed, getLocalSupabaseConfig } from "../lib/supabase-local";
+
+function loadEnvFile() {
+  const requestedPath = process.argv.find((argument) => argument.startsWith("--env-file="))?.split("=")[1];
+  const envPath = resolve(process.cwd(), requestedPath || ".env.local");
+
+  if (!existsSync(envPath)) {
+    return;
+  }
+
+  const values = parseEnvFile(readFileSync(envPath, "utf8"));
+
+  for (const [key, value] of Object.entries(values)) {
+    process.env[key] ||= value;
+  }
+}
 
 type DemoSeed = ReturnType<typeof buildDemoMarketSeed>;
 
@@ -43,6 +61,7 @@ async function ensureUser(adminClient: any, userSeed: DemoSeed["users"][number])
 }
 
 async function main() {
+  loadEnvFile();
   const { serviceRoleKey, supabaseUrl } = getLocalSupabaseConfig();
   const seed = buildDemoMarketSeed();
   const adminClient = createClient(supabaseUrl, serviceRoleKey, {
