@@ -809,6 +809,12 @@ label,
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+  align-items: center;
+}
+
+.board-toolbar > input[type="hidden"] {
+  /* Keep hidden inputs out of the grid track so layout doesn't reserve a cell. */
+  display: none;
 }
 
 .board-list-panel {
@@ -1026,6 +1032,7 @@ label,
 .admin-filter-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
 }
 
