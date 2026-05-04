@@ -9,6 +9,9 @@ import { isAdminProfile } from "../../../lib/auth-utils";
 import { getMarketPostById } from "../../../lib/market-server";
 import { canManageMarketPost, getStatusLabel, getTradeTypeLabel } from "../../../lib/market-utils";
 import { getCurrentProfile } from "../../../lib/supabase/server";
+import { getTrustSignal } from "../../../lib/trust-server";
+import { getMembershipLabel, getSuccessRate, getTrustBadge } from "../../../lib/trust-utils";
+import { TrustBadge } from "../../../components/TrustBadge";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -50,6 +53,18 @@ export default async function ListingDetailPage({
   const commentAction = createMarketCommentAction.bind(null, item.id);
   const closeAction = closeMarketPostAction.bind(null, item.id);
   const deleteAction = deleteMarketPostAction.bind(null, item.id);
+
+  const trustSignal = await getTrustSignal(item.authorId);
+  const trustBadge = trustSignal
+    ? getTrustBadge({
+        joinedAtIso: trustSignal.joinedAtIso,
+        role: item.authorRoleLabel === "관리자" ? "admin" : "member",
+        totalPosts: trustSignal.totalPosts
+      })
+    : null;
+  const trustSuccessRate = trustSignal
+    ? getSuccessRate(trustSignal.totalPosts, trustSignal.closedPosts)
+    : 0;
 
   return (
     <main>
@@ -226,6 +241,30 @@ export default async function ListingDetailPage({
               <span>댓글 {item.commentCount}</span>
               <span>조회 {item.views}</span>
             </div>
+
+            {trustSignal && trustBadge ? (
+              <div className="trust-card">
+                <div className="trust-card__row">
+                  <span className="trust-card__label">신뢰 등급</span>
+                  <TrustBadge kind={trustBadge.kind} label={trustBadge.label} />
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">총 거래</span>
+                  <span className="trust-card__value">
+                    {trustSignal.totalPosts}회 · 완료 {trustSignal.closedPosts}회
+                    {trustSignal.totalPosts > 0 ? ` (${trustSuccessRate}%)` : ""}
+                  </span>
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">댓글 응답</span>
+                  <span className="trust-card__value">{trustSignal.commentCount}건</span>
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">가입</span>
+                  <span className="trust-card__value">{getMembershipLabel(trustSignal.joinedAtIso)}</span>
+                </div>
+              </div>
+            ) : null}
             <Link className="button button--dark button--full" href={item.tradeType === "buy" ? "/sell" : "/buy"}>
               {item.tradeType === "buy" ? "판매 글 등록하기" : "구매 글 등록하기"}
             </Link>

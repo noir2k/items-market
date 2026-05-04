@@ -577,6 +577,48 @@ label,
   color: #4b5563;
 }
 
+/* Trust signals — author badge + summary card */
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.trust-badge--newcomer { background: var(--surface-muted); color: var(--muted); }
+.trust-badge--regular  { background: var(--primary-soft); color: var(--primary); }
+.trust-badge--active   { background: var(--trade-buy-soft); color: var(--trade-buy); }
+.trust-badge--admin    { background: rgba(37, 99, 235, 0.16); color: var(--trust-verified); }
+
+.trust-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.trust-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.trust-card__label {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.trust-card__value {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
 /* Game brand chips — apply via getGameChipClass(slug) */
 .game-tag {
   display: inline-flex;
