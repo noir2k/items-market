@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getActivityLabel,
   getMembershipDays,
   getMembershipLabel,
   getSuccessRate,
@@ -39,6 +40,15 @@ describe("getSuccessRate", () => {
     expect(getSuccessRate(0, 0)).toBe(0);
     expect(getSuccessRate(10, 7)).toBe(70);
     expect(getSuccessRate(3, 1)).toBe(33);
+  });
+});
+
+describe("getActivityLabel", () => {
+  it("describes recent activity in Korean", () => {
+    expect(getActivityLabel(0, 0)).toBe("최근 활동 없음");
+    expect(getActivityLabel(1, 0)).toBe("최근 30일 1회 활동");
+    expect(getActivityLabel(3, 2)).toBe("최근 30일 5회 활동 (활발)");
+    expect(getActivityLabel(15, 0)).toBe("최근 30일 15회 활동 (매우 활발)");
   });
 });
 

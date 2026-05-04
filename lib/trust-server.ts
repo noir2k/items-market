@@ -2,11 +2,27 @@ import { createClient } from "./supabase/server";
 import type { TrustSignal } from "./types";
 
 interface TradeStatsRow {
-  comment_count: number | string;
   closed_posts: number | string;
+  comment_count: number | string;
   joined_at: string;
   profile_id: string;
+  recent_comments_30d: number | string;
+  recent_posts_30d: number | string;
   total_posts: number | string;
+}
+
+const SELECT_FIELDS = "profile_id, joined_at, total_posts, closed_posts, comment_count, recent_posts_30d, recent_comments_30d";
+
+function mapRow(row: TradeStatsRow): TrustSignal {
+  return {
+    closedPosts: Number(row.closed_posts ?? 0),
+    commentCount: Number(row.comment_count ?? 0),
+    joinedAtIso: row.joined_at,
+    profileId: row.profile_id,
+    recentComments30d: Number(row.recent_comments_30d ?? 0),
+    recentPosts30d: Number(row.recent_posts_30d ?? 0),
+    totalPosts: Number(row.total_posts ?? 0)
+  };
 }
 
 export async function getTrustSignalsByIds(profileIds: string[]): Promise<Record<string, TrustSignal>> {
@@ -17,7 +33,7 @@ export async function getTrustSignalsByIds(profileIds: string[]): Promise<Record
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("profile_trade_stats")
-    .select("profile_id, joined_at, total_posts, closed_posts, comment_count")
+    .select(SELECT_FIELDS)
     .in("profile_id", profileIds);
 
   if (error || !data) {
@@ -25,13 +41,7 @@ export async function getTrustSignalsByIds(profileIds: string[]): Promise<Record
   }
 
   return (data as TradeStatsRow[]).reduce<Record<string, TrustSignal>>((accumulator, row) => {
-    accumulator[row.profile_id] = {
-      closedPosts: Number(row.closed_posts ?? 0),
-      commentCount: Number(row.comment_count ?? 0),
-      joinedAtIso: row.joined_at,
-      profileId: row.profile_id,
-      totalPosts: Number(row.total_posts ?? 0)
-    };
+    accumulator[row.profile_id] = mapRow(row);
     return accumulator;
   }, {});
 }
@@ -44,7 +54,7 @@ export async function getTrustSignal(profileId: string | null | undefined): Prom
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("profile_trade_stats")
-    .select("profile_id, joined_at, total_posts, closed_posts, comment_count")
+    .select(SELECT_FIELDS)
     .eq("profile_id", profileId)
     .single();
 
@@ -52,12 +62,5 @@ export async function getTrustSignal(profileId: string | null | undefined): Prom
     return null;
   }
 
-  const row = data as TradeStatsRow;
-  return {
-    closedPosts: Number(row.closed_posts ?? 0),
-    commentCount: Number(row.comment_count ?? 0),
-    joinedAtIso: row.joined_at,
-    profileId: row.profile_id,
-    totalPosts: Number(row.total_posts ?? 0)
-  };
+  return mapRow(data as TradeStatsRow);
 }

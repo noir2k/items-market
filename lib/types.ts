@@ -55,6 +55,8 @@ export interface TrustSignal {
   totalPosts: number;
   closedPosts: number;
   commentCount: number;
+  recentPosts30d: number;
+  recentComments30d: number;
 }
 
 export type TrustBadgeKind = "newcomer" | "regular" | "active" | "admin";

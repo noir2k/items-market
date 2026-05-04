@@ -33,6 +33,20 @@ export function getSuccessRate(totalPosts: number, closedPosts: number): number 
   return Math.round((closedPosts / totalPosts) * 100);
 }
 
+export function getActivityLabel(recentPosts: number, recentComments: number): string {
+  const total = recentPosts + recentComments;
+  if (total === 0) {
+    return "최근 활동 없음";
+  }
+  if (total < 3) {
+    return `최근 30일 ${total}회 활동`;
+  }
+  if (total < 10) {
+    return `최근 30일 ${total}회 활동 (활발)`;
+  }
+  return `최근 30일 ${total}회 활동 (매우 활발)`;
+}
+
 export function getTrustBadge({
   joinedAtIso,
   now = new Date(),

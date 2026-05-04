@@ -7,7 +7,7 @@ import { getMarketSummary } from "../../lib/market-utils";
 import { getMemberStatusLabel, getRoleLabel } from "../../lib/auth-utils";
 import { getCurrentProfile } from "../../lib/supabase/server";
 import { getTrustSignal } from "../../lib/trust-server";
-import { getMembershipLabel, getSuccessRate, getTrustBadge } from "../../lib/trust-utils";
+import { getActivityLabel, getMembershipLabel, getSuccessRate, getTrustBadge } from "../../lib/trust-utils";
 import { TrustBadge } from "../../components/TrustBadge";
 
 export const metadata = {
@@ -113,6 +113,12 @@ export default async function MyPage({
                 <div className="trust-card__row">
                   <span className="trust-card__label">댓글 활동</span>
                   <span className="trust-card__value">{trustSignal.commentCount}건</span>
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">최근 활동</span>
+                  <span className="trust-card__value">
+                    {getActivityLabel(trustSignal.recentPosts30d, trustSignal.recentComments30d)}
+                  </span>
                 </div>
                 <div className="trust-card__row">
                   <span className="trust-card__label">가입</span>
