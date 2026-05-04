@@ -49,6 +49,16 @@ export interface MarketPost {
   canManage?: boolean;
 }
 
+export interface TrustSignal {
+  profileId: string;
+  joinedAtIso: string;
+  totalPosts: number;
+  closedPosts: number;
+  commentCount: number;
+}
+
+export type TrustBadgeKind = "newcomer" | "regular" | "active" | "admin";
+
 export interface AdminMemberProfile {
   created_at?: string;
   email?: string;
