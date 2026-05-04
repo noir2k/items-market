@@ -709,6 +709,133 @@ label,
   font-size: 0.92rem;
 }
 
+/* Game Hub — landing grid on /market */
+.game-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.game-hub-card {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-7);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.game-hub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 56px rgba(15, 23, 42, 0.12);
+}
+
+.game-hub-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.game-tag-large {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.game-hub-card.game-tag--maplestory   .game-tag-large { background: rgba(255, 152, 0, 0.16);  color: var(--game-maple); }
+.game-hub-card.game-tag--lineagem     .game-tag-large { background: rgba(91, 33, 182, 0.16);  color: var(--game-lineage); }
+.game-hub-card.game-tag--fc-online    .game-tag-large { background: rgba(14, 165, 233, 0.16); color: var(--game-fc); }
+.game-hub-card.game-tag--lostark      .game-tag-large { background: rgba(185, 28, 28, 0.16);  color: var(--game-lostark); }
+.game-hub-card.game-tag--dnf          .game-tag-large { background: rgba(245, 158, 11, 0.16); color: var(--game-dnf); }
+.game-hub-card.game-tag--aion         .game-tag-large { background: rgba(6, 182, 212, 0.16);  color: var(--game-aion); }
+
+.game-hub-card__cta {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.game-hub-card__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.game-hub-card__metric {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.game-hub-card__metric strong {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.game-hub-card__metric span {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.game-hub-card__metric--buy strong { color: var(--trade-buy); }
+.game-hub-card__metric--sell strong { color: var(--trade-sell); }
+
+/* Game sub-nav — horizontal chip row on /market/game/[slug] */
+.game-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.game-subnav__item {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.game-subnav__item:hover {
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.game-subnav__item--active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* inactive chip은 game brand color로 텍스트만 강조 (.game-tag--{slug} 색 상속) */
+.game-subnav__item.game-tag--maplestory:not(.game-subnav__item--active)   { color: var(--game-maple); }
+.game-subnav__item.game-tag--lineagem:not(.game-subnav__item--active)     { color: var(--game-lineage); }
+.game-subnav__item.game-tag--fc-online:not(.game-subnav__item--active)    { color: var(--game-fc); }
+.game-subnav__item.game-tag--lostark:not(.game-subnav__item--active)      { color: var(--game-lostark); }
+.game-subnav__item.game-tag--dnf:not(.game-subnav__item--active)          { color: var(--game-dnf); }
+.game-subnav__item.game-tag--aion:not(.game-subnav__item--active)         { color: var(--game-aion); }
+
 /* Game brand chips — apply via getGameChipClass(slug) */
 .game-tag {
   display: inline-flex;

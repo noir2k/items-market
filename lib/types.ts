@@ -78,6 +78,14 @@ export interface MarketGameOption {
   slug: string;
 }
 
+export interface GameBoardStat {
+  game: MarketGameOption;
+  totalPosts: number;
+  openPosts: number;
+  sellPosts: number;
+  buyPosts: number;
+}
+
 export interface MarketCommentRecord {
   id: number | string;
   author?: {

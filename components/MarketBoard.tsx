@@ -165,47 +165,7 @@ export function MarketBoard({
   }
 
   return (
-    <div className="board-shell">
-      <aside className="board-sidebar panel">
-        <div className="section-heading section-heading--compact">
-          <div>
-            <p className="eyebrow">GAME HUB</p>
-            <h2>게임별 카테고리</h2>
-          </div>
-        </div>
-
-        <div className="game-nav">
-          <Link
-            className={`game-nav__button${game === "all" ? " game-nav__button--active" : ""}`}
-            href={buildBoardHref("all")}
-          >
-            <span>전체 게임</span>
-            <strong>{posts.length}</strong>
-          </Link>
-
-          {gameStats.map((item) => (
-            <Link
-              className={`game-nav__button${game === item.game ? " game-nav__button--active" : ""}`}
-              key={item.game}
-              href={buildBoardHref(item.game)}
-            >
-              <span>{item.game}</span>
-              <strong>{item.count}</strong>
-            </Link>
-          ))}
-        </div>
-
-        <div className="board-note">
-          <strong>게시판 시나리오</strong>
-          <ul className="bullet-list">
-            <li>게임별로 삽니다 / 팝니다 글을 분리해서 탐색</li>
-            <li>댓글로 거래 의사나 판매 제안을 남기는 구조</li>
-            <li>글쓴이 또는 관리자가 거래완료 처리할 수 있는 흐름</li>
-          </ul>
-        </div>
-      </aside>
-
-      <div className="board-content">
+    <div className="board-content">
         <div className="summary-grid summary-grid--compact">
           <SummaryCard label="전체 게시글" value={summary.totalCount} />
           <SummaryCard label="거래중" value={summary.openCount} />
@@ -313,7 +273,6 @@ export function MarketBoard({
             </div>
           )}
         </section>
-      </div>
     </div>
   );
 }

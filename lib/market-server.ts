@@ -1,4 +1,4 @@
-import type { MarketCategoryCode, MarketGameOption, MarketPost, MarketPostRecord, MarketStatus, TradeType } from "./types";
+import type { GameBoardStat, MarketCategoryCode, MarketGameOption, MarketPost, MarketPostRecord, MarketStatus, TradeType } from "./types";
 import { mapMarketPostRecord } from "./market-utils";
 import { createClient } from "./supabase/server";
 
@@ -169,6 +169,40 @@ export async function getMarketPostById(id: string): Promise<MarketPost | null> 
 
 export async function listPostsByAuthor(authorId: string): Promise<MarketPost[]> {
   return runPostQuery(MARKET_POST_LIST_SELECT, { authorId });
+}
+
+export async function listGameBoardStats(): Promise<GameBoardStat[]> {
+  const supabase = await createClient();
+  const [gamesResult, postsResult] = await Promise.all([
+    supabase
+      .from("games")
+      .select("id, slug, name")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true }),
+    supabase.from("market_posts").select("game_id, status, trade_type")
+  ]);
+
+  if (gamesResult.error || postsResult.error) {
+    return [];
+  }
+
+  const games = (gamesResult.data ?? []) as MarketGameOption[];
+  const posts = (postsResult.data ?? []) as Array<{
+    game_id: number;
+    status: MarketStatus;
+    trade_type: TradeType;
+  }>;
+
+  return games.map((game) => {
+    const gamePosts = posts.filter((post) => post.game_id === game.id);
+    return {
+      buyPosts: gamePosts.filter((post) => post.trade_type === "buy").length,
+      game,
+      openPosts: gamePosts.filter((post) => post.status === "open").length,
+      sellPosts: gamePosts.filter((post) => post.trade_type === "sell").length,
+      totalPosts: gamePosts.length
+    };
+  });
 }
 
 export async function listMarketGameOptions(): Promise<MarketGameOption[]> {
