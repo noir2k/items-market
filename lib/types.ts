@@ -72,10 +72,23 @@ export interface AdminMemberProfile {
   status: MemberStatus;
 }
 
+export type GameGenre =
+  | "mmorpg_pc"
+  | "mmorpg_mobile"
+  | "rpg_mobile"
+  | "action"
+  | "sports"
+  | "fps"
+  | "moba"
+  | "casual"
+  | "other";
+
 export interface MarketGameOption {
   id: number;
   name: string;
   slug: string;
+  genre?: GameGenre;
+  iconPath?: string | null;
 }
 
 export interface GameBoardStat {

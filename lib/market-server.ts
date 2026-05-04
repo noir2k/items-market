@@ -1,4 +1,4 @@
-import type { GameBoardStat, MarketCategoryCode, MarketGameOption, MarketPost, MarketPostRecord, MarketStatus, TradeType } from "./types";
+import type { GameBoardStat, GameGenre, MarketCategoryCode, MarketGameOption, MarketPost, MarketPostRecord, MarketStatus, TradeType } from "./types";
 import { mapMarketPostRecord } from "./market-utils";
 import { createClient } from "./supabase/server";
 
@@ -197,12 +197,30 @@ export async function listPostsByAuthor(authorId: string): Promise<MarketPost[]>
   return runPostQuery(MARKET_POST_LIST_SELECT, { authorId });
 }
 
+interface GameRow {
+  id: number;
+  name: string;
+  slug: string;
+  genre: GameGenre | null;
+  icon_path: string | null;
+}
+
+function mapGameRow(row: GameRow): MarketGameOption {
+  return {
+    genre: row.genre ?? "other",
+    iconPath: row.icon_path,
+    id: row.id,
+    name: row.name,
+    slug: row.slug
+  };
+}
+
 export async function listGameBoardStats(): Promise<GameBoardStat[]> {
   const supabase = await createClient();
   const [gamesResult, postsResult] = await Promise.all([
     supabase
       .from("games")
-      .select("id, slug, name")
+      .select("id, slug, name, genre, icon_path")
       .eq("is_active", true)
       .order("sort_order", { ascending: true }),
     supabase.from("market_posts").select("game_id, status, trade_type")
@@ -212,7 +230,7 @@ export async function listGameBoardStats(): Promise<GameBoardStat[]> {
     return [];
   }
 
-  const games = (gamesResult.data ?? []) as MarketGameOption[];
+  const games = ((gamesResult.data ?? []) as GameRow[]).map(mapGameRow);
   const posts = (postsResult.data ?? []) as Array<{
     game_id: number;
     status: MarketStatus;
@@ -235,7 +253,7 @@ export async function listMarketGameOptions(): Promise<MarketGameOption[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("games")
-    .select("id, slug, name")
+    .select("id, slug, name, genre, icon_path")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
@@ -243,7 +261,7 @@ export async function listMarketGameOptions(): Promise<MarketGameOption[]> {
     throw new Error(error.message);
   }
 
-  return (data ?? []) as MarketGameOption[];
+  return ((data ?? []) as GameRow[]).map(mapGameRow);
 }
 
 export async function getMarketStats(): Promise<{

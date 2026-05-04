@@ -1,16 +1,29 @@
 import Link from "next/link";
-import { GameHubCard } from "../../components/GameHubCard";
+import { GameGenreSection, GENRE_DISPLAY_ORDER } from "../../components/GameGenreSection";
 import { MarketGameQuickNav } from "../../components/MarketGameQuickNav";
 import { listGameBoardStats } from "../../lib/market-server";
+import type { GameBoardStat, GameGenre } from "../../lib/types";
 
 export const metadata = {
   title: "거래소 | ITEMMARKET"
 };
 
+function groupStatsByGenre(stats: GameBoardStat[]): Map<GameGenre, GameBoardStat[]> {
+  const groups = new Map<GameGenre, GameBoardStat[]>();
+  for (const stat of stats) {
+    const genre = stat.game.genre ?? "other";
+    const bucket = groups.get(genre) ?? [];
+    bucket.push(stat);
+    groups.set(genre, bucket);
+  }
+  return groups;
+}
+
 export default async function MarketPage() {
   const stats = await listGameBoardStats();
   const totalOpen = stats.reduce((sum, stat) => sum + stat.openPosts, 0);
-  const totalPosts = stats.reduce((sum, stat) => sum + stat.totalPosts, 0);
+  const totalGames = stats.length;
+  const groups = groupStatsByGenre(stats);
 
   return (
     <main>
@@ -26,8 +39,7 @@ export default async function MarketPage() {
           <p className="eyebrow">MARKET HUB</p>
           <h1>거래소</h1>
           <p>
-            게임 카드를 눌러 해당 게시판으로 이동합니다. 현재 전체 {totalPosts.toLocaleString("ko-KR")}건의
-            거래 글 중 {totalOpen.toLocaleString("ko-KR")}건이 거래 중입니다.
+            {totalGames}개 게임 · 거래중 {totalOpen.toLocaleString("ko-KR")}건. 장르별 섹션에서 원하는 게임을 선택해 게시판으로 이동합니다.
           </p>
         </div>
       </section>
@@ -40,11 +52,11 @@ export default async function MarketPage() {
 
       <section className="section">
         <div className="container">
-          <div className="game-hub-grid">
-            {stats.map((stat) => (
-              <GameHubCard key={stat.game.slug} stat={stat} />
-            ))}
-          </div>
+          {GENRE_DISPLAY_ORDER.map((genre) => {
+            const sectionStats = groups.get(genre);
+            if (!sectionStats || sectionStats.length === 0) return null;
+            return <GameGenreSection key={genre} genre={genre} stats={sectionStats} />;
+          })}
         </div>
       </section>
     </main>

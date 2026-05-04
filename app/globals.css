@@ -23,13 +23,30 @@
   --status-open: #16a34a;
   --status-closed: #94a3b8;
 
-  /* Game brand colors */
-  --game-maple: #ff9800;
-  --game-lineage: #5b21b6;
-  --game-fc: #0ea5e9;
-  --game-lostark: #b91c1c;
-  --game-dnf: #f59e0b;
-  --game-aion: #06b6d4;
+  /* Game brand colors — closest to each game's official identity (logo/package). */
+  --game-maple: #ff8a00;        /* MapleStory orange leaf */
+  --game-lineage: #c8102e;      /* Lineage red (시리즈 통일) */
+  --game-lostark: #d4af37;      /* LostArk gold */
+  --game-fc: #00aeef;           /* EA SPORTS FC blue */
+  --game-dnf: #f6921e;          /* 던전앤파이터 orange */
+  --game-aion: #5b9bd5;         /* Aion 천사 blue */
+  --game-bdo: #1a1a1a;          /* 검은사막 black */
+  --game-wow: #1565c0;          /* WoW Azeroth blue */
+  --game-genshin: #4a90e2;      /* 원신 hoyoverse blue */
+  --game-arknights: #2c2c2c;    /* 명일방주 dark grey */
+  --game-valorant: #ff4655;     /* Valorant signature red */
+  --game-overwatch: #f99e1a;    /* Overwatch orange */
+  --game-diablo: #b00020;       /* Diablo blood red */
+  --game-odin: #2f4858;         /* 오딘 navy */
+
+  /* Genre fallback colors — used when game-specific token absent */
+  --genre-mmorpg-pc: #6366f1;
+  --genre-mmorpg-mobile: #ec4899;
+  --genre-rpg-mobile: #8b5cf6;
+  --genre-sports: #10b981;
+  --genre-fps: #ef4444;
+  --genre-action: #f97316;
+  --genre-other: #64748b;
 
   /* Risk / Trust */
   --warn: #f59e0b;
@@ -728,6 +745,34 @@ label,
   font-size: 0.92rem;
 }
 
+/* Genre section — group hub cards by game genre */
+.genre-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.genre-section + .genre-section {
+  margin-top: var(--space-10);
+}
+
+.genre-section__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.genre-section__head h2 {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.genre-section__head p.muted {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
 /* Game Hub — landing grid on /market */
 .game-hub-grid {
   display: grid;
@@ -770,45 +815,58 @@ label,
   white-space: nowrap;
 }
 
-.game-hub-card.game-tag--maplestory   .game-tag-large { background: rgba(255, 152, 0, 0.16);  color: var(--game-maple); }
-.game-hub-card.game-tag--lineagem     .game-tag-large { background: rgba(91, 33, 182, 0.16);  color: var(--game-lineage); }
-.game-hub-card.game-tag--fc-online    .game-tag-large { background: rgba(14, 165, 233, 0.16); color: var(--game-fc); }
-.game-hub-card.game-tag--lostark      .game-tag-large { background: rgba(185, 28, 28, 0.16);  color: var(--game-lostark); }
-.game-hub-card.game-tag--dnf          .game-tag-large { background: rgba(245, 158, 11, 0.16); color: var(--game-dnf); }
-.game-hub-card.game-tag--aion         .game-tag-large { background: rgba(6, 182, 212, 0.16);  color: var(--game-aion); }
+.game-hub-card.game-tag--maplestory   .game-tag-large { background: rgba(255, 138, 0, 0.16);   color: var(--game-maple); }
+.game-hub-card.game-tag--lineagem     .game-tag-large,
+.game-hub-card.game-tag--lineagew     .game-tag-large,
+.game-hub-card.game-tag--lineage2m    .game-tag-large { background: rgba(200, 16, 46, 0.14);    color: var(--game-lineage); }
+.game-hub-card.game-tag--fc-online    .game-tag-large { background: rgba(0, 174, 239, 0.16);    color: var(--game-fc); }
+.game-hub-card.game-tag--lostark      .game-tag-large { background: rgba(212, 175, 55, 0.22);   color: #8b6f1c; }
+.game-hub-card.game-tag--dnf          .game-tag-large { background: rgba(246, 146, 30, 0.16);   color: var(--game-dnf); }
+.game-hub-card.game-tag--aion         .game-tag-large { background: rgba(91, 155, 213, 0.18);   color: var(--game-aion); }
+.game-hub-card.game-tag--bdo          .game-tag-large { background: rgba(26, 26, 26, 0.10);     color: var(--game-bdo); }
+.game-hub-card.game-tag--wow          .game-tag-large { background: rgba(21, 101, 192, 0.14);   color: var(--game-wow); }
+.game-hub-card.game-tag--odin         .game-tag-large { background: rgba(47, 72, 88, 0.14);     color: var(--game-odin); }
+.game-hub-card.game-tag--genshin      .game-tag-large { background: rgba(74, 144, 226, 0.16);   color: var(--game-genshin); }
+.game-hub-card.game-tag--arknights    .game-tag-large { background: rgba(44, 44, 44, 0.10);     color: var(--game-arknights); }
+.game-hub-card.game-tag--valorant     .game-tag-large { background: rgba(255, 70, 85, 0.14);    color: var(--game-valorant); }
+.game-hub-card.game-tag--overwatch    .game-tag-large { background: rgba(249, 158, 26, 0.16);   color: var(--game-overwatch); }
+.game-hub-card.game-tag--diablo4      .game-tag-large { background: rgba(176, 0, 32, 0.14);     color: var(--game-diablo); }
 
 .game-hub-card__cta {
   color: var(--muted);
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
-.game-hub-card__stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.game-hub-card:hover .game-hub-card__cta {
+  transform: translateX(4px);
+}
+
+.game-hub-card__body {
+  display: flex;
+  align-items: baseline;
   gap: var(--space-3);
 }
 
 .game-hub-card__metric {
-  display: grid;
-  gap: 2px;
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--surface-muted);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
 }
 
 .game-hub-card__metric strong {
-  font-size: 1.4rem;
+  font-size: 2rem;
   font-weight: 800;
+  color: var(--text);
+  font-family: var(--font-display), var(--font-body), sans-serif;
 }
 
 .game-hub-card__metric span {
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   color: var(--muted);
+  font-weight: 500;
 }
-
-.game-hub-card__metric--buy strong { color: var(--trade-buy); }
-.game-hub-card__metric--sell strong { color: var(--trade-sell); }
 
 /* Game quick nav — popular boards strip (limit-N) for /market and /market/game/[slug] */
 .game-quicknav {
@@ -867,11 +925,21 @@ label,
 }
 
 .game-quicknav__item.game-tag--maplestory:not(.game-quicknav__item--active)   { color: var(--game-maple); }
-.game-quicknav__item.game-tag--lineagem:not(.game-quicknav__item--active)     { color: var(--game-lineage); }
+.game-quicknav__item.game-tag--lineagem:not(.game-quicknav__item--active),
+.game-quicknav__item.game-tag--lineagew:not(.game-quicknav__item--active),
+.game-quicknav__item.game-tag--lineage2m:not(.game-quicknav__item--active)    { color: var(--game-lineage); }
 .game-quicknav__item.game-tag--fc-online:not(.game-quicknav__item--active)    { color: var(--game-fc); }
-.game-quicknav__item.game-tag--lostark:not(.game-quicknav__item--active)      { color: var(--game-lostark); }
+.game-quicknav__item.game-tag--lostark:not(.game-quicknav__item--active)      { color: #8b6f1c; }
 .game-quicknav__item.game-tag--dnf:not(.game-quicknav__item--active)          { color: var(--game-dnf); }
 .game-quicknav__item.game-tag--aion:not(.game-quicknav__item--active)         { color: var(--game-aion); }
+.game-quicknav__item.game-tag--bdo:not(.game-quicknav__item--active)          { color: var(--game-bdo); }
+.game-quicknav__item.game-tag--wow:not(.game-quicknav__item--active)          { color: var(--game-wow); }
+.game-quicknav__item.game-tag--odin:not(.game-quicknav__item--active)         { color: var(--game-odin); }
+.game-quicknav__item.game-tag--genshin:not(.game-quicknav__item--active)      { color: var(--game-genshin); }
+.game-quicknav__item.game-tag--arknights:not(.game-quicknav__item--active)    { color: var(--game-arknights); }
+.game-quicknav__item.game-tag--valorant:not(.game-quicknav__item--active)     { color: var(--game-valorant); }
+.game-quicknav__item.game-tag--overwatch:not(.game-quicknav__item--active)    { color: var(--game-overwatch); }
+.game-quicknav__item.game-tag--diablo4:not(.game-quicknav__item--active)      { color: var(--game-diablo); }
 
 .game-quicknav__item--active {
   background: var(--accent);
@@ -946,12 +1014,22 @@ label,
   white-space: nowrap;
 }
 
-.game-tag--maplestory { background: rgba(255, 152, 0, 0.16);  color: var(--game-maple); }
-.game-tag--lineagem   { background: rgba(91, 33, 182, 0.16);  color: var(--game-lineage); }
-.game-tag--fc-online  { background: rgba(14, 165, 233, 0.16); color: var(--game-fc); }
-.game-tag--lostark    { background: rgba(185, 28, 28, 0.16);  color: var(--game-lostark); }
-.game-tag--dnf        { background: rgba(245, 158, 11, 0.16); color: var(--game-dnf); }
-.game-tag--aion       { background: rgba(6, 182, 212, 0.16);  color: var(--game-aion); }
+.game-tag--maplestory { background: rgba(255, 138, 0, 0.16);   color: var(--game-maple); }
+.game-tag--lineagem,
+.game-tag--lineagew,
+.game-tag--lineage2m  { background: rgba(200, 16, 46, 0.14);    color: var(--game-lineage); }
+.game-tag--fc-online  { background: rgba(0, 174, 239, 0.16);    color: var(--game-fc); }
+.game-tag--lostark    { background: rgba(212, 175, 55, 0.22);   color: #8b6f1c; }
+.game-tag--dnf        { background: rgba(246, 146, 30, 0.16);   color: var(--game-dnf); }
+.game-tag--aion       { background: rgba(91, 155, 213, 0.18);   color: var(--game-aion); }
+.game-tag--bdo        { background: rgba(26, 26, 26, 0.10);     color: var(--game-bdo); }
+.game-tag--wow        { background: rgba(21, 101, 192, 0.14);   color: var(--game-wow); }
+.game-tag--odin       { background: rgba(47, 72, 88, 0.14);     color: var(--game-odin); }
+.game-tag--genshin    { background: rgba(74, 144, 226, 0.16);   color: var(--game-genshin); }
+.game-tag--arknights  { background: rgba(44, 44, 44, 0.10);     color: var(--game-arknights); }
+.game-tag--valorant   { background: rgba(255, 70, 85, 0.14);    color: var(--game-valorant); }
+.game-tag--overwatch  { background: rgba(249, 158, 26, 0.16);   color: var(--game-overwatch); }
+.game-tag--diablo4    { background: rgba(176, 0, 32, 0.14);     color: var(--game-diablo); }
 
 .chip--interactive {
   border: 0;

@@ -91,6 +91,28 @@ async function main() {
     }
   }
 
+  // seed.sql은 기존 6개 게임을 default genre='other'로 INSERT한다 (호환을 위해 컬럼 명시 안 함).
+  // bootstrap에서 명시적으로 genre를 한 번 더 덮어써 PROD-grade 분류를 보장.
+  const baseGenreMap: Record<string, string> = {
+    aion: "mmorpg_pc",
+    dnf: "mmorpg_pc",
+    "fc-online": "sports",
+    lineagem: "mmorpg_mobile",
+    lostark: "mmorpg_pc",
+    maplestory: "mmorpg_pc"
+  };
+
+  for (const [slug, genre] of Object.entries(baseGenreMap)) {
+    const { error: genreError } = await adminClient
+      .from("games")
+      .update({ genre })
+      .eq("slug", slug);
+
+    if (genreError) {
+      throw new Error(`Failed to update genre for ${slug}: ${genreError.message}`);
+    }
+  }
+
   const { data: games, error: gamesError } = await adminClient.from("games").select("id, slug");
 
   if (gamesError) {
