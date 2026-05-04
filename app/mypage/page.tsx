@@ -6,6 +6,9 @@ import { listPostsByAuthor } from "../../lib/market-server";
 import { getMarketSummary } from "../../lib/market-utils";
 import { getMemberStatusLabel, getRoleLabel } from "../../lib/auth-utils";
 import { getCurrentProfile } from "../../lib/supabase/server";
+import { getTrustSignal } from "../../lib/trust-server";
+import { getMembershipLabel, getSuccessRate, getTrustBadge } from "../../lib/trust-utils";
+import { TrustBadge } from "../../components/TrustBadge";
 
 export const metadata = {
   title: "마이페이지 | ITEMMARKET"
@@ -23,8 +26,21 @@ export default async function MyPage({
     redirect("/login?error=" + encodeURIComponent("로그인 후 마이페이지를 이용해 주세요."));
   }
 
-  const posts = await listPostsByAuthor(user.id);
+  const [posts, trustSignal] = await Promise.all([
+    listPostsByAuthor(user.id),
+    getTrustSignal(user.id)
+  ]);
   const summary = getMarketSummary(posts);
+  const trustBadge = trustSignal
+    ? getTrustBadge({
+        joinedAtIso: trustSignal.joinedAtIso,
+        role: profile.role,
+        totalPosts: trustSignal.totalPosts
+      })
+    : null;
+  const trustSuccessRate = trustSignal
+    ? getSuccessRate(trustSignal.totalPosts, trustSignal.closedPosts)
+    : 0;
 
   return (
     <main>
@@ -80,6 +96,30 @@ export default async function MyPage({
                 <p>{getMemberStatusLabel(profile.status)}</p>
               </div>
             </div>
+
+            {trustSignal && trustBadge ? (
+              <div className="trust-card">
+                <div className="trust-card__row">
+                  <span className="trust-card__label">신뢰 등급</span>
+                  <TrustBadge kind={trustBadge.kind} label={trustBadge.label} />
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">총 거래</span>
+                  <span className="trust-card__value">
+                    {trustSignal.totalPosts}회 · 완료 {trustSignal.closedPosts}회
+                    {trustSignal.totalPosts > 0 ? ` (${trustSuccessRate}%)` : ""}
+                  </span>
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">댓글 활동</span>
+                  <span className="trust-card__value">{trustSignal.commentCount}건</span>
+                </div>
+                <div className="trust-card__row">
+                  <span className="trust-card__label">가입</span>
+                  <span className="trust-card__value">{getMembershipLabel(trustSignal.joinedAtIso)}</span>
+                </div>
+              </div>
+            ) : null}
 
             <div className="summary-grid">
               <article className="summary-card">
