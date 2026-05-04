@@ -577,6 +577,46 @@ label,
   color: #4b5563;
 }
 
+/* Safety checklist — status-aware safe-trade reminders */
+.safety-checklist {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.safety-checklist__item {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.safety-checklist__mark {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  font-weight: 700;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.safety-checklist__item--done {
+  color: var(--text);
+}
+
+.safety-checklist__item--done .safety-checklist__mark {
+  background: var(--trade-buy-soft);
+  color: var(--trade-buy);
+}
+
 /* Trade timeline — listing detail progress steps */
 .trade-timeline {
   display: grid;

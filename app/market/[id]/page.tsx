@@ -75,6 +75,29 @@ export default async function ListingDetailPage({
     status: item.status
   });
 
+  const safetyChecks = [
+    {
+      checked: Boolean(item.server && item.quantity),
+      key: "verify-info",
+      label: "서버 / 캐릭터 / 수량 정보가 등록되었는지 확인"
+    },
+    {
+      checked: item.commentCount > 0,
+      key: "comment-thread",
+      label: "거래 조건이 댓글로 기록되었는지 확인"
+    },
+    {
+      checked: item.status === "open",
+      key: "in-progress",
+      label: "거래 진행 중 (글이 거래중 상태)"
+    },
+    {
+      checked: item.status === "closed",
+      key: "completed",
+      label: "거래완료 처리 후 정산 확인"
+    }
+  ];
+
   return (
     <main>
       <section className="topbar">
@@ -168,11 +191,19 @@ export default async function ListingDetailPage({
             </div>
 
             <div className="detail-box">
-              <h3>안전거래 안내</h3>
-              <ul className="bullet-list">
-                <li>구매 전 서버명, 캐릭터명, 수량을 반드시 재확인합니다.</li>
-                <li>댓글 또는 문의 내용에 실제 연락처를 남기기 전 거래 조건을 먼저 확인해 주세요.</li>
-                <li>거래가 끝난 뒤에는 완료 상태와 정산 내역을 다시 확인해 주세요.</li>
+              <h3>안전거래 체크</h3>
+              <ul className="safety-checklist">
+                {safetyChecks.map((check) => (
+                  <li
+                    key={check.key}
+                    className={`safety-checklist__item${check.checked ? " safety-checklist__item--done" : ""}`}
+                  >
+                    <span className="safety-checklist__mark" aria-hidden="true">
+                      {check.checked ? "✓" : "○"}
+                    </span>
+                    <span>{check.label}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
