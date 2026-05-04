@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GameHubCard } from "../../components/GameHubCard";
+import { MarketGameQuickNav } from "../../components/MarketGameQuickNav";
 import { listGameBoardStats } from "../../lib/market-server";
 
 export const metadata = {
@@ -28,6 +29,12 @@ export default async function MarketPage() {
             게임 카드를 눌러 해당 게시판으로 이동합니다. 현재 전체 {totalPosts.toLocaleString("ko-KR")}건의
             거래 글 중 {totalOpen.toLocaleString("ko-KR")}건이 거래 중입니다.
           </p>
+        </div>
+      </section>
+
+      <section className="section section--compact">
+        <div className="container">
+          <MarketGameQuickNav stats={stats} />
         </div>
       </section>
 

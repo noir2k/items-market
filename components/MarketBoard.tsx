@@ -32,15 +32,6 @@ const statusOptions = [
   { label: "거래완료", value: "closed" }
 ] as const satisfies ReadonlyArray<{ label: string; value: StatusFilter }>;
 
-function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <article className="summary-card">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </article>
-  );
-}
-
 function isMarketCategoryFilterCode(value: string | undefined): value is MarketCategoryFilterCode {
   return marketCategoryOptions.some((option) => option.code === value);
 }
@@ -68,8 +59,8 @@ export function MarketBoard({
   const [tradeType, setTradeTypeState] = useState<TradeTypeFilter>(
     initialTradeType === "buy" || initialTradeType === "sell" ? initialTradeType : "all"
   );
-  const gameNames = games.map((item) => item.name);
-  const [game, setGameState] = useState(gameNames.includes(initialGame || "") ? initialGame || "all" : "all");
+  const knownGameNames = new Set(games.map((item) => item.name));
+  const [game, setGameState] = useState(knownGameNames.has(initialGame || "") ? initialGame || "all" : "all");
   const [status, setStatusState] = useState<StatusFilter>(
     initialStatus === "open" || initialStatus === "closed" ? initialStatus : "all"
   );
@@ -89,17 +80,6 @@ export function MarketBoard({
     tradeType
   });
   const summary = getMarketSummary(posts);
-  const gameStats = games.map((item) => ({
-    count: posts.filter((post) => post.game === item.name).length,
-    game: item.name,
-    slug: item.slug
-  }));
-  const selectedSummary = getMarketSummary(filteredPosts);
-  const boardTitle = game === "all" ? "전체 게임 게시판" : `${game} 게시판`;
-  const boardDescription =
-    game === "all"
-      ? "모든 게임의 삽니다 / 팝니다 게시글을 최신순으로 확인합니다."
-      : `${game} 안의 삽니다 / 팝니다 게시글을 일반 게시판 목록으로 확인합니다.`;
 
   function updateBoardUrl(nextFilters: {
     category?: MarketCategoryFilterCode;
@@ -123,25 +103,9 @@ export function MarketBoard({
     if (server) params.set("server", server);
 
     const query = params.toString();
-    const gameSlug = gameStats.find((item) => item.game === next.game)?.slug;
+    const gameSlug = games.find((item) => item.name === next.game)?.slug;
     const pathname = gameSlug && next.game !== "all" ? `/market/game/${gameSlug}` : "/market";
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-  }
-
-  function buildBoardHref(nextGame: string) {
-    const params = new URLSearchParams();
-
-    if (tradeType !== "all") params.set("tradeType", tradeType);
-    if (category !== "all") params.set("category", category);
-    if (status !== "all") params.set("status", status);
-    if (keyword) params.set("q", keyword);
-    if (server) params.set("server", server);
-
-    const query = params.toString();
-    const gameSlug = gameStats.find((item) => item.game === nextGame)?.slug;
-    const pathname = gameSlug && nextGame !== "all" ? `/market/game/${gameSlug}` : "/market";
-
-    return query ? `${pathname}?${query}` : pathname;
   }
 
   function setGame(nextGame: string) {
