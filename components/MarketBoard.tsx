@@ -166,38 +166,33 @@ export function MarketBoard({
 
   return (
     <div className="board-content">
-        <div className="summary-grid summary-grid--compact">
-          <SummaryCard label="전체 게시글" value={summary.totalCount} />
-          <SummaryCard label="거래중" value={summary.openCount} />
-          <SummaryCard label="팝니다" value={summary.sellCount} />
-          <SummaryCard label="삽니다" value={summary.buyCount} />
-          <SummaryCard label="댓글 문의" value={summary.commentCount} />
+        <div className="board-meta-strip" aria-label="게시판 요약">
+          <span className="board-meta-strip__item"><strong>{summary.totalCount}</strong> 전체</span>
+          <span className="board-meta-strip__sep" aria-hidden="true">·</span>
+          <span className="board-meta-strip__item"><strong>{summary.openCount}</strong> 거래중</span>
+          <span className="board-meta-strip__sep" aria-hidden="true">·</span>
+          <span className="board-meta-strip__item">
+            <strong className="board-meta-strip__sell">{summary.sellCount}</strong> 팝니다 ·
+            <strong className="board-meta-strip__buy"> {summary.buyCount}</strong> 삽니다
+          </span>
+          <span className="board-meta-strip__sep" aria-hidden="true">·</span>
+          <span className="board-meta-strip__item"><strong>{summary.commentCount}</strong> 댓글</span>
+          {filteredPosts.length !== summary.totalCount ? (
+            <span className="board-meta-strip__filtered">
+              필터 결과 {filteredPosts.length}건
+            </span>
+          ) : null}
         </div>
 
-        <section className="panel board-list-panel">
-          <div className="board-list-panel__head">
-            <div>
-              <p className="eyebrow">GAME BOARD</p>
-              <h2>{boardTitle}</h2>
-              <p className="muted">{boardDescription}</p>
-            </div>
-            <div className="board-list-panel__stats" aria-label="현재 게시판 요약">
-              <span>현재 조건 {filteredPosts.length}건</span>
-              <strong>거래중 {selectedSummary.openCount}</strong>
-              <strong>거래완료 {selectedSummary.closedCount}</strong>
-            </div>
+        {(keyword || server) ? (
+          <div className="board-active-filters">
+            {keyword ? <span className="chip chip--muted">검색어: {keyword}</span> : null}
+            {server ? <span className="chip chip--muted">서버: {server}</span> : null}
+            <Link className="text-link" href="/market">
+              전체 조건 초기화
+            </Link>
           </div>
-
-          {(keyword || server) ? (
-            <div className="board-active-filters">
-              {keyword ? <span className="chip chip--muted">검색어: {keyword}</span> : null}
-              {server ? <span className="chip chip--muted">서버: {server}</span> : null}
-              <Link className="text-link" href="/market">
-                전체 조건 초기화
-              </Link>
-            </div>
-          ) : null}
-        </section>
+        ) : null}
 
         <section className="filter-panel">
           <div className="filter-row filter-row--stack">

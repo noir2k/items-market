@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GameSubNav } from "../../../../components/GameSubNav";
 import { MarketBoard } from "../../../../components/MarketBoard";
-import { listMarketGameOptions, listMarketPosts } from "../../../../lib/market-server";
+import { listMarketGameOptions, listMarketPostsByGameSlug } from "../../../../lib/market-server";
 
 type GameBoardSearchParams = {
   category?: string;
@@ -13,7 +12,10 @@ type GameBoardSearchParams = {
 };
 
 async function getGameBoardContext(slug: string) {
-  const [posts, games] = await Promise.all([listMarketPosts(), listMarketGameOptions()]);
+  const [posts, games] = await Promise.all([
+    listMarketPostsByGameSlug(slug),
+    listMarketGameOptions()
+  ]);
   const game = games.find((item) => item.slug === slug);
 
   return {
@@ -64,15 +66,14 @@ export default async function GameBoardPage({
 
       <section className="page-hero page-hero--compact">
         <div className="container">
+          <div className="page-hero__row">
+            <Link className="page-hero__back" href="/market">
+              ← 전체 거래소 허브
+            </Link>
+          </div>
           <p className="eyebrow">GAME BOARD</p>
           <h1>{game.name} 게시판</h1>
           <p>이 게임의 거래 글만 모아 일반 게시판 목록으로 확인하고 거래 문의를 이어갈 수 있습니다.</p>
-        </div>
-      </section>
-
-      <section className="section section--compact">
-        <div className="container">
-          <GameSubNav activeSlug={slug} games={games} />
         </div>
       </section>
 

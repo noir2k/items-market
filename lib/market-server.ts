@@ -142,6 +142,32 @@ export async function listMarketPosts(): Promise<MarketPost[]> {
   return runPostQuery(MARKET_POST_LIST_SELECT);
 }
 
+export async function listMarketPostsByGameSlug(slug: string): Promise<MarketPost[]> {
+  const supabase = await createClient();
+  const { data: gameRow, error: gameError } = await supabase
+    .from("games")
+    .select("id")
+    .eq("slug", slug)
+    .single();
+
+  if (gameError || !gameRow) {
+    return [];
+  }
+
+  const gameId = (gameRow as { id: number }).id;
+  const { data, error } = await supabase
+    .from("market_posts")
+    .select(MARKET_POST_LIST_SELECT)
+    .eq("game_id", gameId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return [];
+  }
+
+  return ((data ?? []) as any[]).map((record) => mapMarketPostRecord(normalizeRecordShape(record)));
+}
+
 export async function listFeaturedMarketPosts(limit = 3): Promise<MarketPost[]> {
   return runPostQuery(MARKET_POST_LIST_SELECT, {
     limit,
