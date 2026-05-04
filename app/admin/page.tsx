@@ -10,6 +10,9 @@ import { formatMonthOption } from "../../lib/admin-utils";
 import { getAdminDashboardData } from "../../lib/admin-server";
 import { getStatusLabel, getTradeTypeLabel } from "../../lib/market-utils";
 import { getMemberStatusLabel, getRoleLabel, isAdminProfile } from "../../lib/auth-utils";
+import { getTrustSignalsByIds } from "../../lib/trust-server";
+import { getTrustBadge } from "../../lib/trust-utils";
+import { TrustBadge } from "../../components/TrustBadge";
 import { getCurrentProfile } from "../../lib/supabase/server";
 
 export const metadata = {
@@ -46,6 +49,7 @@ export default async function AdminPage({
     memberId: params.memberId || null,
     month: params.month || null
   });
+  const trustSignalsByMemberId = await getTrustSignalsByIds(dashboard.members.map((member) => member.id));
 
   return (
     <main>
@@ -141,11 +145,21 @@ export default async function AdminPage({
               </div>
 
               <div className="admin-list">
-                {dashboard.members.map((member) => (
+                {dashboard.members.map((member) => {
+                  const trust = trustSignalsByMemberId[member.id];
+                  const trustBadge = trust && member.role
+                    ? getTrustBadge({
+                        joinedAtIso: trust.joinedAtIso,
+                        role: member.role,
+                        totalPosts: trust.totalPosts
+                      })
+                    : null;
+                  return (
                   <article className={`admin-list__row${params.memberId === member.id ? " admin-list__row--active" : ""}`} key={member.id}>
                     <div className="admin-list__main">
                       <strong>
                         <Link href={`/admin?memberId=${encodeURIComponent(member.id)}`}>{member.nickname}</Link>
+                        {trustBadge ? <> <TrustBadge kind={trustBadge.kind} label={trustBadge.label} /></> : null}
                       </strong>
                       <div className="market-table__meta">
                         {member.email} · {getRoleLabel(member.role)} · 상태 {getMemberStatusLabel(member.status)}
@@ -174,7 +188,8 @@ export default async function AdminPage({
                       )}
                     </div>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             </section>
 
