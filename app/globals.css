@@ -262,7 +262,7 @@ label,
 .menu-toggle {
   display: none;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface);
   padding: 10px 14px;
 }
@@ -275,7 +275,7 @@ label,
   min-height: 48px;
   padding: 0 18px;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.95rem;
   font-weight: 700;
   white-space: nowrap;
@@ -415,7 +415,7 @@ label,
 
 .stat {
   padding: 18px;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(219, 227, 238, 0.95);
 }
@@ -471,7 +471,7 @@ label,
 .tabs {
   display: inline-flex;
   padding: 5px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface-muted);
 }
 
@@ -479,7 +479,7 @@ label,
   border: 0;
   background: transparent;
   padding: 10px 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--muted);
   font-weight: 700;
 }
@@ -535,7 +535,7 @@ label,
   align-items: center;
   min-height: 38px;
   padding: 0 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface-muted);
   color: #475467;
   font-size: 0.9rem;
@@ -735,7 +735,7 @@ label,
   align-items: center;
   min-height: 28px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--primary-soft);
   color: var(--primary);
   font-size: 0.8rem;
@@ -914,7 +914,7 @@ label,
   width: 100%;
   padding: 14px 16px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: #fbfdff;
   color: var(--text);
   text-align: left;
@@ -1002,7 +1002,7 @@ label,
   align-items: center;
   min-height: 34px;
   padding: 7px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(37, 99, 235, 0.08);
   color: var(--primary);
   font-size: 0.85rem;
@@ -1103,7 +1103,7 @@ label,
 .market-table__pill {
   justify-self: start;
   padding: 7px 11px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(37, 99, 235, 0.1);
   color: var(--primary);
   font-size: 0.86rem;
@@ -1322,7 +1322,7 @@ label,
 
 .seller-stats span {
   padding: 8px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface-muted);
   color: #475467;
   font-size: 0.88rem;
@@ -1335,7 +1335,7 @@ label,
   bottom: 20px;
   z-index: 30;
   padding: 16px 18px;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: #0f172a;
   color: white;
   box-shadow: var(--shadow);
