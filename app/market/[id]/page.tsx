@@ -87,9 +87,10 @@ export default async function ListingDetailPage({
       label: "거래 조건이 댓글로 기록되었는지 확인"
     },
     {
-      checked: item.status === "open",
+      // 거래가 진행됐다는 사실(open 또는 close 모두 포함)
+      checked: item.commentCount > 0 || item.status === "closed",
       key: "in-progress",
-      label: "거래 진행 중 (글이 거래중 상태)"
+      label: "거래 진행 단계에 진입"
     },
     {
       checked: item.status === "closed",

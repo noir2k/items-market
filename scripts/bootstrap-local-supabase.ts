@@ -99,8 +99,14 @@ async function main() {
 
   const gameIdBySlug = Object.fromEntries(games.map((game) => [game.slug, game.id]));
 
+  // 거래완료 게시글에 timeline의 "거래완료" 단계가 timestamp를 가질 수 있도록
+  // closed_at + closed_by(관리자)를 시뮬레이션. 진짜 운영에서는 server action이 채움.
+  const adminUserId = userIdsByEmail["admin@itemmarket.local"];
+  const seededClosedAt = new Date().toISOString();
+
   for (const postSeed of seed.posts) {
-    const postPayload = {
+    const isClosed = postSeed.status === "closed";
+    const postPayload: Record<string, unknown> = {
       author_id: userIdsByEmail[postSeed.authorEmail],
       category: postSeed.category,
       content: postSeed.content,
@@ -113,7 +119,9 @@ async function main() {
       status: postSeed.status,
       title: postSeed.title,
       trade_type: postSeed.tradeType,
-      view_count: postSeed.viewCount
+      view_count: postSeed.viewCount,
+      closed_at: isClosed ? seededClosedAt : null,
+      closed_by: isClosed ? adminUserId ?? null : null
     };
 
     const { error: postError } = await adminClient
