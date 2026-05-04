@@ -41,6 +41,8 @@ export interface MarketPost {
   createdAt?: string;
   updatedAtIso?: string;
   createdAtIso?: string;
+  closedAtIso?: string;
+  firstCommentAtIso?: string;
   views?: number;
   summary?: string;
   badges?: string[];
@@ -90,6 +92,7 @@ export interface MarketPostRecord {
   id: number | string;
   author_id: string;
   category: MarketCategoryCode;
+  closed_at?: string | null;
   content: string;
   created_at: string;
   game?: MarketGameOption | null;

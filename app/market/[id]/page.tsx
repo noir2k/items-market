@@ -7,11 +7,12 @@ import {
 } from "../actions";
 import { isAdminProfile } from "../../../lib/auth-utils";
 import { getMarketPostById } from "../../../lib/market-server";
-import { canManageMarketPost, getStatusLabel, getTradeTypeLabel } from "../../../lib/market-utils";
+import { canManageMarketPost, getStatusLabel, getTradeTimeline, getTradeTypeLabel } from "../../../lib/market-utils";
 import { getCurrentProfile } from "../../../lib/supabase/server";
 import { getTrustSignal } from "../../../lib/trust-server";
 import { getActivityLabel, getMembershipLabel, getSuccessRate, getTrustBadge } from "../../../lib/trust-utils";
 import { TrustBadge } from "../../../components/TrustBadge";
+import { TradeTimeline } from "../../../components/TradeTimeline";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -65,6 +66,14 @@ export default async function ListingDetailPage({
   const trustSuccessRate = trustSignal
     ? getSuccessRate(trustSignal.totalPosts, trustSignal.closedPosts)
     : 0;
+
+  const tradeTimeline = getTradeTimeline({
+    closedAtIso: item.closedAtIso,
+    commentCount: item.commentCount,
+    createdAtIso: item.createdAtIso,
+    firstCommentAtIso: item.firstCommentAtIso,
+    status: item.status
+  });
 
   return (
     <main>
@@ -151,6 +160,11 @@ export default async function ListingDetailPage({
             <div className="detail-box">
               <h3>거래 설명</h3>
               <p className="muted">{item.content}</p>
+            </div>
+
+            <div className="detail-box">
+              <h3>거래 진행 상태</h3>
+              <TradeTimeline state={tradeTimeline} />
             </div>
 
             <div className="detail-box">

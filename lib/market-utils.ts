@@ -167,6 +167,9 @@ export function mapMarketCommentRecord(
 
 export function mapMarketPostRecord(record: MarketPostRecord, now: Date = new Date()): MarketPost {
   const comments = (record.market_comments ?? []).map((comment) => mapMarketCommentRecord(comment, record.trade_type, now));
+  const sortedRawComments = (record.market_comments ?? [])
+    .slice()
+    .sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""));
 
   return {
     authorId: record.author_id,
@@ -174,11 +177,13 @@ export function mapMarketPostRecord(record: MarketPostRecord, now: Date = new Da
     authorRoleLabel: formatRoleLabel(record.profile?.role),
     badges: [getTradeTypeLabel(record.trade_type), getCategoryLabel(record.category)],
     category: getCategoryLabel(record.category),
+    closedAtIso: record.closed_at || undefined,
     commentCount: comments.length,
     comments,
     content: record.content,
     createdAt: formatRelativeTime(record.created_at, now),
     createdAtIso: record.created_at,
+    firstCommentAtIso: sortedRawComments[0]?.created_at,
     game: record.game?.name || "미분류 게임",
     gameSlug: record.game?.slug,
     id: String(record.id),
@@ -270,6 +275,61 @@ export function filterMarketPosts({
 
     return true;
   });
+}
+
+export type TradeTimelineStage = "registered" | "inquired" | "active" | "closed";
+
+export interface TradeTimelineStep {
+  key: TradeTimelineStage;
+  label: string;
+  status: "done" | "current" | "pending";
+  timestamp?: string;
+}
+
+export interface TradeTimelineState {
+  stage: TradeTimelineStage;
+  steps: TradeTimelineStep[];
+}
+
+export function getTradeTimeline({
+  closedAtIso,
+  commentCount,
+  createdAtIso,
+  firstCommentAtIso,
+  status
+}: {
+  closedAtIso?: string;
+  commentCount: number;
+  createdAtIso?: string;
+  firstCommentAtIso?: string;
+  status: MarketStatus;
+}): TradeTimelineState {
+  const isClosed = status === "closed";
+  const hasInquiry = commentCount > 0;
+  const stage: TradeTimelineStage = isClosed ? "closed" : hasInquiry ? "active" : "registered";
+
+  const steps: TradeTimelineStep[] = [
+    { key: "registered", label: "등록", status: "done", timestamp: createdAtIso },
+    {
+      key: "inquired",
+      label: hasInquiry ? `문의 ${commentCount}건` : "문의 대기",
+      status: hasInquiry ? "done" : stage === "registered" ? "current" : "pending",
+      timestamp: firstCommentAtIso
+    },
+    {
+      key: "active",
+      label: "거래 진행",
+      status: !isClosed && hasInquiry ? "current" : isClosed ? "done" : "pending"
+    },
+    {
+      key: "closed",
+      label: "거래완료",
+      status: isClosed ? "done" : "pending",
+      timestamp: closedAtIso
+    }
+  ];
+
+  return { stage, steps };
 }
 
 export function getMarketSummary(posts: MarketPost[] = []): {

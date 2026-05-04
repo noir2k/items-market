@@ -17,9 +17,10 @@ const MARKET_POST_LIST_SELECT = `
   view_count,
   created_at,
   updated_at,
+  closed_at,
   game:games(id, slug, name),
   profile:profiles!market_posts_author_id_fkey(nickname, role),
-  market_comments(id)
+  market_comments(id, created_at)
 `;
 
 const MARKET_POST_DETAIL_SELECT = `
@@ -37,6 +38,7 @@ const MARKET_POST_DETAIL_SELECT = `
   view_count,
   created_at,
   updated_at,
+  closed_at,
   game:games(id, slug, name),
   profile:profiles!market_posts_author_id_fkey(nickname, role),
   market_comments(

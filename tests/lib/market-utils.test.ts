@@ -7,6 +7,7 @@ import {
   getGameStats,
   getGameTagClass,
   getMarketSummary,
+  getTradeTimeline,
   getTradeTypeLabel,
   mapMarketPostRecord,
   marketCategoryOptions,
@@ -190,6 +191,45 @@ describe("market helpers", () => {
   it("maps trade type codes to Korean labels", () => {
     expect(getTradeTypeLabel("buy")).toBe("삽니다");
     expect(getTradeTypeLabel("sell")).toBe("팝니다");
+  });
+
+  it("derives a 4-step trade timeline based on status/comments", () => {
+    const baseInputs = {
+      closedAtIso: undefined,
+      createdAtIso: "2026-05-01T00:00:00Z",
+      firstCommentAtIso: undefined
+    };
+
+    // 등록 직후 (open, comments 0)
+    const registered = getTradeTimeline({ ...baseInputs, commentCount: 0, status: "open" });
+    expect(registered.stage).toBe("registered");
+    expect(registered.steps[0].status).toBe("done");
+    expect(registered.steps[1].status).toBe("current");
+    expect(registered.steps[3].status).toBe("pending");
+
+    // 거래 진행 (open, comments > 0)
+    const active = getTradeTimeline({
+      ...baseInputs,
+      commentCount: 3,
+      firstCommentAtIso: "2026-05-02T00:00:00Z",
+      status: "open"
+    });
+    expect(active.stage).toBe("active");
+    expect(active.steps[1].status).toBe("done");
+    expect(active.steps[2].status).toBe("current");
+    expect(active.steps[3].status).toBe("pending");
+
+    // 거래완료
+    const closed = getTradeTimeline({
+      closedAtIso: "2026-05-03T00:00:00Z",
+      commentCount: 3,
+      createdAtIso: "2026-05-01T00:00:00Z",
+      firstCommentAtIso: "2026-05-02T00:00:00Z",
+      status: "closed"
+    });
+    expect(closed.stage).toBe("closed");
+    expect(closed.steps.every((step) => step.status === "done")).toBe(true);
+    expect(closed.steps[3].timestamp).toBe("2026-05-03T00:00:00Z");
   });
 
   it("keeps game slugs available for independent board routes", () => {
