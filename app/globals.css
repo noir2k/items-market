@@ -782,10 +782,24 @@ label,
   gap: var(--space-4);
 }
 
+/*
+ * Game hub card — 새 구조 (2026-05-05)
+ *  ┌────────────────────────────────────┐
+ *  │ [ICON 52]  GameName            →   │  ← head
+ *  │ ─────────────────────────────────  │
+ *  │ 24                                 │  ← metric (large num)
+ *  │ 거래중 게시글                       │
+ *  └────────────────────────────────────┘
+ *
+ * 카드 자체에 .game-tag--{slug} 클래스가 적용되어 brand color tint
+ * 배경 + brand text color를 자동 상속한다. 내부에 별도 pill 없음.
+ */
 .game-hub-card {
   display: grid;
-  gap: var(--space-4);
-  padding: var(--space-7);
+  grid-template-rows: auto 1fr;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  min-height: 168px;
   border-radius: var(--radius-lg);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -801,52 +815,47 @@ label,
 }
 
 .game-hub-card__head {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
 }
 
-.game-tag-large {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-pill);
-  font-size: 1.05rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.game-tag-large__icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+.game-hub-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   object-fit: cover;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 }
 
-.game-hub-card.game-tag--maplestory   .game-tag-large { background: rgba(255, 138, 0, 0.16);   color: var(--game-maple); }
-.game-hub-card.game-tag--lineagem     .game-tag-large,
-.game-hub-card.game-tag--lineagew     .game-tag-large,
-.game-hub-card.game-tag--lineage2m    .game-tag-large { background: rgba(200, 16, 46, 0.14);    color: var(--game-lineage); }
-.game-hub-card.game-tag--fc-online    .game-tag-large { background: rgba(0, 174, 239, 0.16);    color: var(--game-fc); }
-.game-hub-card.game-tag--lostark      .game-tag-large { background: rgba(212, 175, 55, 0.22);   color: #8b6f1c; }
-.game-hub-card.game-tag--dnf          .game-tag-large { background: rgba(246, 146, 30, 0.16);   color: var(--game-dnf); }
-.game-hub-card.game-tag--aion         .game-tag-large { background: rgba(91, 155, 213, 0.18);   color: var(--game-aion); }
-.game-hub-card.game-tag--bdo          .game-tag-large { background: rgba(26, 26, 26, 0.10);     color: var(--game-bdo); }
-.game-hub-card.game-tag--wow          .game-tag-large { background: rgba(21, 101, 192, 0.14);   color: var(--game-wow); }
-.game-hub-card.game-tag--odin         .game-tag-large { background: rgba(47, 72, 88, 0.14);     color: var(--game-odin); }
-.game-hub-card.game-tag--genshin      .game-tag-large { background: rgba(74, 144, 226, 0.16);   color: var(--game-genshin); }
-.game-hub-card.game-tag--arknights    .game-tag-large { background: rgba(44, 44, 44, 0.10);     color: var(--game-arknights); }
-.game-hub-card.game-tag--valorant     .game-tag-large { background: rgba(255, 70, 85, 0.14);    color: var(--game-valorant); }
-.game-hub-card.game-tag--overwatch    .game-tag-large { background: rgba(249, 158, 26, 0.16);   color: var(--game-overwatch); }
-.game-hub-card.game-tag--diablo4      .game-tag-large { background: rgba(176, 0, 32, 0.14);     color: var(--game-diablo); }
+.game-hub-card__icon--placeholder {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.game-hub-card__name {
+  /* color는 .game-tag--{slug} 부모 룰로부터 brand color를 상속받음 */
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
 
 .game-hub-card__cta {
   color: var(--muted);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   transition: transform var(--duration-fast) var(--ease-out);
 }
@@ -855,27 +864,24 @@ label,
   transform: translateX(4px);
 }
 
-.game-hub-card__body {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-}
-
 .game-hub-card__metric {
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .game-hub-card__metric strong {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 800;
   color: var(--text);
   font-family: var(--font-display), var(--font-body), sans-serif;
+  line-height: 1;
 }
 
 .game-hub-card__metric span {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--muted);
   font-weight: 500;
 }
