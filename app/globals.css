@@ -2155,6 +2155,12 @@ label,
   background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
 }
 
+/* staff 페이지의 형제 panel 사이 명시적 간격.
+   .staff-shell 내부에서만 적용되어 일반 사이트 chrome에는 영향 없음. */
+.staff-shell .container > .panel + .panel {
+  margin-top: var(--space-5);
+}
+
 .staff-header {
   position: sticky;
   top: 0;
@@ -2304,13 +2310,26 @@ label,
 .staff-game-row__title {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.staff-game-row__title a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.staff-game-row__title a:hover {
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 .staff-game-row__icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(15, 23, 42, 0.06);
@@ -2541,7 +2560,7 @@ label,
   place-items: center;
   font-family: var(--font-display), sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: var(--muted);
   background: var(--surface-muted);
 }

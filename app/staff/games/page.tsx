@@ -232,7 +232,9 @@ export default async function StaffGamesPage({
                             {game.name.charAt(0)}
                           </span>
                         )}
-                        <span>{game.name}</span>
+                        <Link href={`/market/game/${game.slug}`} title={`${game.name} 게시판으로 이동`}>
+                          {game.name}
+                        </Link>
                       </strong>
                       <div className="market-table__meta">
                         slug: <code>{game.slug}</code> · {genreLabel} · 정렬 #{game.sortOrder}
