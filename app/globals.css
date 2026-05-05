@@ -422,6 +422,8 @@ label,
 }
 
 .hero__content {
+  display: flex;
+  flex-direction: column;
   border-radius: 36px;
   padding: 44px;
   background:
@@ -475,9 +477,12 @@ label,
   margin-top: var(--space-7);
 }
 
-/* Hero 좌측 신뢰성/안전거래 3-mini-feature grid (우측 panel과 visual balance) */
+/* Hero 좌측 신뢰성/안전거래 3-mini-feature grid (우측 panel과 visual balance).
+   margin-top: auto 로 hero__content (flex column) 하단에 push하여 우측의
+   REAL-TIME stats 섹션과 baseline 정렬을 자동으로 맞춘다. */
 .hero__trust {
-  margin-top: var(--space-8);
+  margin-top: auto;
+  padding-top: var(--space-8);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
