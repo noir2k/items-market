@@ -361,6 +361,25 @@ label,
   padding-bottom: var(--space-2);
 }
 
+/* 게임 보드 페이지 — 게시판명 옆 큰 게임 아이콘 */
+.page-hero__title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.page-hero__game-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
 .hero__grid {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.9fr);

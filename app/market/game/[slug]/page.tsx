@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MarketBoard } from "../../../../components/MarketBoard";
 import { MarketGameQuickNav } from "../../../../components/MarketGameQuickNav";
+import { getGameIconUrl } from "../../../../lib/game-icon";
 import { listGameBoardStats, listMarketGameOptions, listMarketPostsByGameSlug } from "../../../../lib/market-server";
 
 type GameBoardSearchParams = {
@@ -58,6 +59,8 @@ export default async function GameBoardPage({
     notFound();
   }
 
+  const iconUrl = getGameIconUrl(game.iconPath);
+
   return (
     <main>
       <section className="topbar">
@@ -75,7 +78,12 @@ export default async function GameBoardPage({
             </Link>
           </div>
           <p className="eyebrow">GAME BOARD</p>
-          <h1>{game.name} 게시판</h1>
+          <h1 className="page-hero__title-with-icon">
+            {iconUrl ? (
+              <img alt="" aria-hidden="true" className="page-hero__game-icon" src={iconUrl} />
+            ) : null}
+            <span>{game.name} 게시판</span>
+          </h1>
           <p>이 게임의 거래 글만 모아 일반 게시판 목록으로 확인하고 거래 문의를 이어갈 수 있습니다.</p>
         </div>
       </section>
