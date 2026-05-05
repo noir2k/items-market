@@ -25,11 +25,33 @@ export async function HeroFeaturePanel() {
     })
     .slice(0, POPULAR_GAME_LIMIT);
 
+  const totalOpen = stats.reduce((sum, stat) => sum + stat.openPosts, 0);
+  const activeGames = stats.filter((stat) => stat.openPosts > 0).length;
+  const totalGames = stats.length;
+
   return (
     <aside className="hero-feature">
       <HeroPopularGames stats={popularGames} />
       <div aria-hidden="true" className="hero-feature__divider" />
       <HeroLiveFeed posts={posts} />
+      <div aria-hidden="true" className="hero-feature__divider" />
+      <div className="hero-feature__stats">
+        <p className="eyebrow">REAL-TIME</p>
+        <div className="hero-feature__stats-row">
+          <div>
+            <strong>{totalOpen.toLocaleString("ko-KR")}</strong>
+            <span>거래중</span>
+          </div>
+          <div>
+            <strong>{activeGames}</strong>
+            <span>활성 게시판</span>
+          </div>
+          <div>
+            <strong>{totalGames}</strong>
+            <span>전체 게임</span>
+          </div>
+        </div>
+      </div>
       <Link className="hero-feature__more" href="/market">
         거래소 전체 보기 →
       </Link>

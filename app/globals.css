@@ -708,32 +708,30 @@ label,
   letter-spacing: 0.08em;
 }
 
-.hero-feature__live-track {
-  position: relative;
-  overflow: hidden;
-  border-radius: 14px;
-  background: var(--surface-muted);
-}
-
-.hero-feature__live-stack {
+.hero-feature__live-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  transition: transform 600ms var(--ease-out);
+  gap: 6px;
 }
 
 .hero-feature__live-card {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3);
+  padding: 10px var(--space-3);
+  border-radius: 12px;
+  background: var(--surface-muted);
   text-decoration: none;
   color: var(--text);
-  flex-shrink: 0;
-  box-sizing: border-box;
+  transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .hero-feature__live-card:hover {
   background: var(--primary-soft);
+  transform: translateX(2px);
 }
 
 .hero-feature__live-icon {
@@ -779,33 +777,50 @@ label,
   text-overflow: ellipsis;
 }
 
-.hero-feature__live-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-
-.hero-feature__live-dot-btn {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: 0;
-  padding: 0;
-  background: var(--line);
-  cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out), width var(--duration-fast) var(--ease-out);
-}
-
-.hero-feature__live-dot-btn.is-active {
-  background: var(--primary);
-  width: 18px;
-  border-radius: 3px;
-}
-
 .hero-feature__live--empty p {
   margin: 0;
   text-align: center;
   padding: var(--space-4);
+}
+
+/* ── 거래 현황 mini stat (3-column) ── */
+.hero-feature__stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hero-feature__stats .eyebrow {
+  margin: 0;
+}
+
+.hero-feature__stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.hero-feature__stats-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.hero-feature__stats-row strong {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+
+.hero-feature__stats-row span {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .tabs {
