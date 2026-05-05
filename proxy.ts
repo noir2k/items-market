@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
 // `/guide`, etc.) skip the supabase session lookup entirely.
 export const config = {
   matcher: [
-    "/admin/:path*",
+    "/staff/:path*",
     "/mypage/:path*",
     "/sell",
     "/buy",

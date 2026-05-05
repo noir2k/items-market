@@ -22,9 +22,8 @@ export function getHeaderNavItems({
     items.push({ href: "/mypage", label: "마이페이지" });
   }
 
-  if (isAuthenticated && isAdmin) {
-    items.push({ href: "/admin", label: "관리자" });
-  }
+  // 관리자 콘솔(/staff/*)은 일반 사이트 nav에 노출하지 않음 — 숨겨진 라우트로 별도 진입.
+  // 관리자 권한 사용자가 /staff URL을 직접 입력하면 staff 콘솔 헤더로 진입한다.
 
   items.push({ href: "/guide", label: "이용안내" });
 
@@ -57,13 +56,13 @@ export function getProtectedRouteRedirect({
   isAuthenticated: boolean;
   pathname: string;
 }): string | null {
-  if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) {
+  if (pathname === "/staff/login" || pathname.startsWith("/staff/login/")) {
     return null;
   }
 
-  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+  if (pathname === "/staff" || pathname.startsWith("/staff/")) {
     if (!isAuthenticated || !isAdmin) {
-      return `/admin/login?error=${encodeURIComponent("관리자 로그인 후 접근해 주세요.")}`;
+      return `/staff/login?error=${encodeURIComponent("관리자 로그인 후 접근해 주세요.")}`;
     }
 
     return null;

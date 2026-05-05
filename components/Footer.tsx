@@ -1,6 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // STAFF 콘솔에서는 공용 푸터 노출하지 않음 (관리자 화면은 chrome 최소화)
+  if (pathname === "/staff" || pathname.startsWith("/staff/")) {
+    return null;
+  }
+
   return (
     <footer className="site-footer">
       <div className="container site-footer__inner">

@@ -15,22 +15,27 @@ function rethrowRedirectError(error: unknown): void {
   }
 }
 
-function redirectWithError(message: string, memberId?: string) {
-  const base = memberId ? `/admin?memberId=${encodeURIComponent(memberId)}` : "/admin";
+function redirectWithError(message: string, returnPath: string, memberId?: string) {
+  const base = memberId
+    ? `${returnPath}${returnPath.includes("?") ? "&" : "?"}memberId=${encodeURIComponent(memberId)}`
+    : returnPath;
   redirect(`${base}${base.includes("?") ? "&" : "?"}error=${encodeURIComponent(message)}`);
 }
 
-function redirectWithMessage(message: string, memberId?: string) {
-  const base = memberId ? `/admin?memberId=${encodeURIComponent(memberId)}` : "/admin";
+function redirectWithMessage(message: string, returnPath: string, memberId?: string) {
+  const base = memberId
+    ? `${returnPath}${returnPath.includes("?") ? "&" : "?"}memberId=${encodeURIComponent(memberId)}`
+    : returnPath;
   redirect(`${base}${base.includes("?") ? "&" : "?"}message=${encodeURIComponent(message)}`);
 }
 
 export async function updateMemberStatusAction(memberId: string, nextStatus: "active" | "suspended") {
+  const returnPath = "/staff/members";
   try {
     const admin = await requireAdminAccess();
 
     if (!admin) {
-      redirect("/admin/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
+      redirect("/staff/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
     }
 
     if (admin.user.id === memberId && nextStatus === "suspended") {
@@ -57,22 +62,28 @@ export async function updateMemberStatusAction(memberId: string, nextStatus: "ac
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin");
+    revalidatePath("/staff");
+    revalidatePath("/staff/members");
     revalidatePath("/market");
     revalidatePath("/mypage");
-    redirectWithMessage("회원 상태가 변경되었습니다.", memberId);
+    redirectWithMessage("회원 상태가 변경되었습니다.", returnPath, memberId);
   } catch (error) {
     rethrowRedirectError(error);
-    redirectWithError(error instanceof Error ? error.message : "회원 상태 변경 중 오류가 발생했습니다.", memberId);
+    redirectWithError(
+      error instanceof Error ? error.message : "회원 상태 변경 중 오류가 발생했습니다.",
+      returnPath,
+      memberId
+    );
   }
 }
 
 export async function adminCloseMarketPostAction(postId: string) {
+  const returnPath = "/staff/posts";
   try {
     const admin = await requireAdminAccess();
 
     if (!admin) {
-      redirect("/admin/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
+      redirect("/staff/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
     }
 
     const { data: post, error: postError } = await admin.supabase
@@ -86,7 +97,7 @@ export async function adminCloseMarketPostAction(postId: string) {
     }
 
     if (post.status === "closed") {
-      redirectWithMessage("이미 거래완료된 게시글입니다.");
+      redirectWithMessage("이미 거래완료된 게시글입니다.", returnPath);
     }
 
     const { error } = await admin.supabase
@@ -102,24 +113,29 @@ export async function adminCloseMarketPostAction(postId: string) {
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin");
+    revalidatePath("/staff");
+    revalidatePath("/staff/posts");
     revalidatePath("/market");
     revalidatePath(`/market/${post.id}`);
     revalidatePath("/mypage");
-    redirectWithMessage("게시글이 거래완료 처리되었습니다.");
+    redirectWithMessage("게시글이 거래완료 처리되었습니다.", returnPath);
   } catch (error) {
     rethrowRedirectError(error);
-    redirectWithError(error instanceof Error ? error.message : "거래완료 처리 중 오류가 발생했습니다.");
+    redirectWithError(
+      error instanceof Error ? error.message : "거래완료 처리 중 오류가 발생했습니다.",
+      returnPath
+    );
   }
 }
 
 export async function adminDeleteMarketPostAction(postId: string, formData: FormData) {
+  const returnPath = "/staff/posts";
   try {
     requireDeleteConfirmation(formData);
     const admin = await requireAdminAccess();
 
     if (!admin) {
-      redirect("/admin/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
+      redirect("/staff/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
     }
 
     const { data: post, error: postError } = await admin.supabase
@@ -138,13 +154,50 @@ export async function adminDeleteMarketPostAction(postId: string, formData: Form
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin");
+    revalidatePath("/staff");
+    revalidatePath("/staff/posts");
     revalidatePath("/market");
     revalidatePath(`/market/${post.id}`);
     revalidatePath("/mypage");
-    redirectWithMessage("게시글이 삭제되었습니다.");
+    redirectWithMessage("게시글이 삭제되었습니다.", returnPath);
   } catch (error) {
     rethrowRedirectError(error);
-    redirectWithError(error instanceof Error ? error.message : "게시글 삭제 중 오류가 발생했습니다.");
+    redirectWithError(
+      error instanceof Error ? error.message : "게시글 삭제 중 오류가 발생했습니다.",
+      returnPath
+    );
+  }
+}
+
+export async function toggleGameActiveAction(gameId: number, nextActive: boolean) {
+  const returnPath = "/staff/games";
+  try {
+    const admin = await requireAdminAccess();
+
+    if (!admin) {
+      redirect("/staff/login?error=" + encodeURIComponent("관리자 로그인 후 접근해 주세요."));
+    }
+
+    const { error } = await admin.supabase
+      .from("games")
+      .update({ is_active: nextActive })
+      .eq("id", gameId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath("/staff/games");
+    revalidatePath("/market");
+    redirectWithMessage(
+      nextActive ? "게시판이 노출 처리되었습니다." : "게시판이 숨김 처리되었습니다.",
+      returnPath
+    );
+  } catch (error) {
+    rethrowRedirectError(error);
+    redirectWithError(
+      error instanceof Error ? error.message : "게시판 상태 변경 중 오류가 발생했습니다.",
+      returnPath
+    );
   }
 }

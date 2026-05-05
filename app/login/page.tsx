@@ -52,8 +52,7 @@ export default async function LoginPage({
               { autoComplete: "current-password", label: "비밀번호", name: "password", placeholder: "비밀번호 입력", type: "password" }
             ]}
             footerLinks={[
-              { href: "/signup", label: "회원가입" },
-              { href: "/admin/login", label: "관리자 로그인" }
+              { href: "/signup", label: "회원가입" }
             ]}
             hiddenFields={getAuthHiddenFields({ mode: "member", nextPath })}
             message={params?.message}

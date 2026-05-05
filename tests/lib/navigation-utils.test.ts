@@ -11,9 +11,11 @@ describe("getHeaderNavItems", () => {
     ]);
   });
 
-  it("exposes mypage to signed-in members and admin to admins", () => {
+  it("exposes mypage to signed-in members but never advertises the staff console in the public nav", () => {
     expect(getHeaderNavItems({ isAdmin: false, isAuthenticated: true }).map((item) => item.href)).toContain("/mypage");
-    expect(getHeaderNavItems({ isAdmin: true, isAuthenticated: true }).map((item) => item.href)).toContain("/admin");
+    // /staff is a hidden console; even admin sessions must not see it in the public nav.
+    expect(getHeaderNavItems({ isAdmin: true, isAuthenticated: true }).map((item) => item.href)).not.toContain("/staff");
+    expect(getHeaderNavItems({ isAdmin: true, isAuthenticated: true }).map((item) => item.href)).not.toContain("/admin");
   });
 });
 
@@ -42,14 +44,17 @@ describe("getProtectedRouteRedirect", () => {
     );
   });
 
-  it("redirects non-admin users away from admin pages", () => {
-    expect(getProtectedRouteRedirect({ isAdmin: false, isAuthenticated: true, pathname: "/admin" })).toBe(
-      "/admin/login?error=%EA%B4%80%EB%A6%AC%EC%9E%90%20%EB%A1%9C%EA%B7%B8%EC%9D%B8%20%ED%9B%84%20%EC%A0%91%EA%B7%BC%ED%95%B4%20%EC%A3%BC%EC%84%B8%EC%9A%94."
+  it("redirects non-admin users away from staff console pages", () => {
+    expect(getProtectedRouteRedirect({ isAdmin: false, isAuthenticated: true, pathname: "/staff" })).toBe(
+      "/staff/login?error=%EA%B4%80%EB%A6%AC%EC%9E%90%20%EB%A1%9C%EA%B7%B8%EC%9D%B8%20%ED%9B%84%20%EC%A0%91%EA%B7%BC%ED%95%B4%20%EC%A3%BC%EC%84%B8%EC%9A%94."
+    );
+    expect(getProtectedRouteRedirect({ isAdmin: false, isAuthenticated: true, pathname: "/staff/members" })).toBe(
+      "/staff/login?error=%EA%B4%80%EB%A6%AC%EC%9E%90%20%EB%A1%9C%EA%B7%B8%EC%9D%B8%20%ED%9B%84%20%EC%A0%91%EA%B7%BC%ED%95%B4%20%EC%A3%BC%EC%84%B8%EC%9A%94."
     );
   });
 
-  it("allows public pages and admin login", () => {
+  it("allows public pages and staff login", () => {
     expect(getProtectedRouteRedirect({ isAdmin: false, isAuthenticated: false, pathname: "/market" })).toBe(null);
-    expect(getProtectedRouteRedirect({ isAdmin: false, isAuthenticated: false, pathname: "/admin/login" })).toBe(null);
+    expect(getProtectedRouteRedirect({ isAdmin: false, isAuthenticated: false, pathname: "/staff/login" })).toBe(null);
   });
 });

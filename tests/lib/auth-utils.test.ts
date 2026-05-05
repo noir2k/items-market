@@ -43,7 +43,7 @@ describe("getMemberStatusLabel", () => {
 
 describe("getPostLoginPath", () => {
   it("prioritizes admin dashboard for admin login", () => {
-    expect(getPostLoginPath({ isAdminLogin: true, nextPath: "/market", profile: { role: "admin", status: "active" } })).toBe("/admin");
+    expect(getPostLoginPath({ isAdminLogin: true, nextPath: "/market", profile: { role: "admin", status: "active" } })).toBe("/staff");
   });
 
   it("uses safe next path when present", () => {

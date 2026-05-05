@@ -30,7 +30,7 @@ export async function signInAction(formData: FormData) {
   });
 
   if (error) {
-    const target = isAdminLogin ? "/admin/login" : "/login";
+    const target = isAdminLogin ? "/staff/login" : "/login";
     redirect(`${target}?error=${encodeURIComponent(error.message)}`);
   }
 
@@ -42,7 +42,7 @@ export async function signInAction(formData: FormData) {
 
   if (isAdminLogin && !isAdminProfile(profile)) {
     await supabase.auth.signOut();
-    redirect("/admin/login?error=" + encodeURIComponent("관리자 계정으로만 접근할 수 있습니다."));
+    redirect("/staff/login?error=" + encodeURIComponent("관리자 계정으로만 접근할 수 있습니다."));
   }
 
   revalidatePath("/", "layout");

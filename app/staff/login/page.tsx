@@ -7,10 +7,10 @@ import { isAdminProfile, sanitizeRedirectPath } from "../../../lib/auth-utils";
 import { getAuthHiddenFields } from "../../../lib/navigation-utils";
 
 export const metadata = {
-  title: "관리자 로그인 | ITEM ODIN"
+  title: "STAFF 로그인 | ITEM ODIN"
 };
 
-export default async function AdminLoginPage({
+export default async function StaffLoginPage({
   searchParams
 }: {
   searchParams: Promise<{ error?: string; message?: string; next?: string }>;
@@ -20,24 +20,17 @@ export default async function AdminLoginPage({
   const nextPath = sanitizeRedirectPath(params?.next);
 
   if (user && isAdminProfile(profile)) {
-    redirect(nextPath || "/admin");
+    redirect(nextPath || "/staff");
   }
   const showLocalAccounts = process.env.NODE_ENV === "development";
 
   return (
     <main>
-      <section className="topbar">
-        <div className="container topbar__inner">
-          <span>관리자 권한이 있는 계정만 관리자 페이지로 진입할 수 있습니다</span>
-          <Link href="/login">일반 로그인</Link>
-        </div>
-      </section>
-
       <section className="page-hero page-hero--compact">
         <div className="container">
-          <p className="eyebrow">ADMIN ACCESS</p>
+          <p className="eyebrow">STAFF ACCESS</p>
           <h1>관리자 로그인</h1>
-          <p>관리자 권한이 있는 계정만 운영 도구에 접근할 수 있습니다.</p>
+          <p>관리자 권한이 있는 계정만 운영 콘솔에 접근할 수 있습니다.</p>
         </div>
       </section>
 
@@ -52,13 +45,12 @@ export default async function AdminLoginPage({
               { autoComplete: "current-password", label: "비밀번호", name: "password", placeholder: "비밀번호 입력", type: "password" }
             ]}
             footerLinks={[
-              { href: "/login", label: "일반 회원 로그인" },
               { href: "/market", label: "거래소로 돌아가기" }
             ]}
             hiddenFields={getAuthHiddenFields({ mode: "admin", nextPath })}
             message={params?.message}
             submitLabel="관리자 로그인"
-            title="관리자 전용 로그인"
+            title="STAFF CONSOLE 로그인"
           />
 
           {showLocalAccounts ? (

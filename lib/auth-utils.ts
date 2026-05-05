@@ -36,7 +36,7 @@ export function getPostLoginPath({
   profile = null
 }: PostLoginPathArgs): string {
   if (isAdminLogin && isAdminProfile(profile)) {
-    return "/admin";
+    return "/staff";
   }
 
   const safeNextPath = sanitizeRedirectPath(nextPath);

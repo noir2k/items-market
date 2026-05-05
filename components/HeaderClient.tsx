@@ -27,6 +27,11 @@ export function HeaderClient({
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
+  // STAFF 콘솔(/staff/*)은 자체 AdminHeader를 렌더하므로 공용 헤더는 숨김
+  if (pathname === "/staff" || pathname.startsWith("/staff/")) {
+    return null;
+  }
+
   return (
     <header className={`site-header${isOpen ? " is-open" : ""}`}>
       <div className="container site-header__inner">

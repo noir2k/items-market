@@ -2,7 +2,19 @@ import { filterPostsByMonth, getAdminSummary, getMonthOptions } from "./admin-ut
 import { listMarketPosts, listPostsByAuthor } from "./market-server";
 import { isAdminProfile } from "./auth-utils";
 import { createClient, getCurrentProfile } from "./supabase/server";
-import type { AdminMemberProfile, MarketPost } from "./types";
+import type { AdminMemberProfile, GameGenre, MarketPost } from "./types";
+
+export interface AdminGameRow {
+  id: number;
+  slug: string;
+  name: string;
+  genre: GameGenre | null;
+  iconPath: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  postCount: number;
+  openPostCount: number;
+}
 
 export interface AdminMemberWithStats extends AdminMemberProfile {
   closedPostCount: number;
@@ -115,4 +127,52 @@ export async function getAdminDashboardData({
     selectedMemberPosts: filteredSelectedMemberPosts,
     summary
   };
+}
+
+interface RawAdminGameRow {
+  id: number;
+  slug: string;
+  name: string;
+  genre: GameGenre | null;
+  icon_path: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export async function listAdminGames(): Promise<AdminGameRow[]> {
+  const supabase = await createClient();
+
+  const [gamesResult, postsResult] = await Promise.all([
+    supabase
+      .from("games")
+      .select("id, slug, name, genre, icon_path, sort_order, is_active")
+      .order("sort_order", { ascending: true }),
+    supabase.from("market_posts").select("game_id, status")
+  ]);
+
+  if (gamesResult.error) {
+    throw new Error(gamesResult.error.message);
+  }
+
+  if (postsResult.error) {
+    throw new Error(postsResult.error.message);
+  }
+
+  const posts = (postsResult.data ?? []) as Array<{ game_id: number; status: string }>;
+  const games = (gamesResult.data ?? []) as RawAdminGameRow[];
+
+  return games.map((game) => {
+    const gamePosts = posts.filter((post) => post.game_id === game.id);
+    return {
+      genre: game.genre,
+      iconPath: game.icon_path,
+      id: game.id,
+      isActive: game.is_active,
+      name: game.name,
+      openPostCount: gamePosts.filter((post) => post.status === "open").length,
+      postCount: gamePosts.length,
+      slug: game.slug,
+      sortOrder: game.sort_order
+    };
+  });
 }
