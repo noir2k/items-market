@@ -194,29 +194,36 @@ select {
   padding: 18px 0;
 }
 
-.brand {
+/* .brand (일반 헤더) / .staff-brand (관리자 콘솔 헤더) — typography/sizing 일관성.
+   색상과 sub-label만 모드별 차이로 유지. */
+.brand,
+.staff-brand {
   display: flex;
   align-items: center;
   gap: var(--space-3);
 }
 
-.brand__mark {
+.brand__mark,
+.staff-brand__mark {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
 }
 
-.brand__mark svg {
+.brand__mark svg,
+.staff-brand__mark svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-.brand__text {
+.brand__text,
+.staff-brand__text {
   display: flex;
   flex-direction: column;
+  line-height: 1.18;
 }
 
 .brand__text strong,
@@ -255,14 +262,25 @@ label,
   overflow-wrap: break-word;
 }
 
-.brand__text strong {
-  font-size: 1.02rem;
-  letter-spacing: 0.02em;
+.brand__text strong,
+.staff-brand__text strong {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
+.brand__text small,
+.staff-brand__text small {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* 색상은 모드별로 분기 — 배경 대비를 위해 분기 유지 */
 .brand__text small {
   color: var(--muted);
-  font-size: 0.78rem;
 }
 
 .site-nav {
@@ -2621,46 +2639,18 @@ label,
   flex-wrap: wrap;
 }
 
+/* staff-brand: 공통 typography는 위 .brand,.staff-brand 묶음에서 적용.
+   여기서는 다크 헤더 배경 대비 색상만 분기. */
 .staff-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
   text-decoration: none;
   color: #f8fafc;
 }
 
-.staff-brand__mark {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-.staff-brand__mark svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.staff-brand__text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-}
-
 .staff-brand__text strong {
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.04em;
   color: #fbbf24;
 }
 
 .staff-brand__text small {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
   color: #cbd5e1;
 }
 
