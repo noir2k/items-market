@@ -6,7 +6,7 @@ import {
   toggleGameActiveAction,
   updateGameAction
 } from "../actions";
-import { listAdminGames } from "../../../lib/admin-server";
+import { listAdminGamesWithViewCounts } from "../../../lib/admin-server";
 import { isAdminProfile } from "../../../lib/auth-utils";
 import { getGameIconUrl } from "../../../lib/game-icon";
 import { getCurrentProfile } from "../../../lib/supabase/server";
@@ -52,7 +52,8 @@ export default async function StaffGamesPage({
   }
 
   const params = await searchParams;
-  const games = await listAdminGames();
+  // GROUP BY view 사용 — 모든 market_posts 행 fetch 대신 28행만 받음
+  const games = await listAdminGamesWithViewCounts();
   const activeCount = games.filter((g) => g.isActive).length;
   const inactiveCount = games.length - activeCount;
   const editingGameId = params.edit ? Number.parseInt(params.edit, 10) : null;

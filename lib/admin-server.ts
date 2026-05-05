@@ -1,5 +1,6 @@
 import { filterPostsByMonth, getAdminSummary, getMonthOptions } from "./admin-utils";
-import { listMarketPosts, listPostsByAuthor } from "./market-server";
+import { listMarketPosts, listPostsByAuthor, MARKET_POST_LIST_SELECT, normalizeRecordShape } from "./market-server";
+import { mapMarketPostRecord } from "./market-utils";
 import { isAdminProfile } from "./auth-utils";
 import { createClient, getCurrentProfile } from "./supabase/server";
 import type { AdminMemberProfile, GameGenre, MarketPost } from "./types";
@@ -249,4 +250,144 @@ export async function listAdminGames(): Promise<AdminGameRow[]> {
       sortOrder: game.sort_order
     };
   });
+}
+
+/**
+ * SQL GROUP BY view를 활용한 게임 카탈로그 + 카운트 조회.
+ * 위 listAdminGames와 동일한 결과를 반환하되, 모든 market_posts 행을 fetch하지 않고
+ * `game_post_counts` 집계 view를 join하여 28번의 reduce 대신 28개 행만 받는다.
+ */
+export async function listAdminGamesWithViewCounts(): Promise<AdminGameRow[]> {
+  const supabase = await createClient();
+
+  const [gamesResult, countsResult] = await Promise.all([
+    supabase
+      .from("games")
+      .select("id, slug, name, genre, icon_path, sort_order, is_active")
+      .order("sort_order", { ascending: true }),
+    supabase.from("game_post_counts").select("game_id, total_count, open_count")
+  ]);
+
+  if (gamesResult.error) throw new Error(gamesResult.error.message);
+  if (countsResult.error) throw new Error(countsResult.error.message);
+
+  const countsByGameId = new Map<number, { total: number; open: number }>(
+    ((countsResult.data ?? []) as Array<{ game_id: number; total_count: number; open_count: number }>).map(
+      (row) => [row.game_id, { open: row.open_count, total: row.total_count }]
+    )
+  );
+
+  return ((gamesResult.data ?? []) as RawAdminGameRow[]).map((game) => {
+    const counts = countsByGameId.get(game.id);
+    return {
+      genre: game.genre,
+      iconPath: game.icon_path,
+      id: game.id,
+      isActive: game.is_active,
+      name: game.name,
+      openPostCount: counts?.open ?? 0,
+      postCount: counts?.total ?? 0,
+      slug: game.slug,
+      sortOrder: game.sort_order
+    };
+  });
+}
+
+/**
+ * /staff/posts 용 SQL offset 페이지네이션. count: 'exact'로 totalCount를 같이 받아
+ * 클라이언트에서 페이지 수 계산 가능. 게임/장르/상태 필터를 SQL 단계에서 처리.
+ */
+export async function listAdminPostsPaged({
+  page = 1,
+  pageSize = 20,
+  filter
+}: {
+  page?: number;
+  pageSize?: number;
+  filter?: AdminPostFilter;
+}): Promise<{ posts: MarketPost[]; totalCount: number }> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // gameSlug -> game_id resolve (slug 필터 시 join 대신 단순 ID 비교)
+  let gameIdFilter: number | null = null;
+  if (filter?.gameSlug && filter.gameSlug !== "all") {
+    const { data: gameRow } = await supabase
+      .from("games")
+      .select("id")
+      .eq("slug", filter.gameSlug)
+      .single();
+    if (!gameRow) return { posts: [], totalCount: 0 };
+    gameIdFilter = (gameRow as { id: number }).id;
+  }
+
+  // 장르 필터는 games 테이블 inner join + .eq("game.genre", X)로 처리
+  const useGenreFilter = Boolean(filter?.genre && filter.genre !== ("all" as GameGenre));
+  const select = useGenreFilter
+    ? MARKET_POST_LIST_SELECT.replace("game:games(", "game:games!inner(")
+    : MARKET_POST_LIST_SELECT;
+
+  let query = supabase
+    .from("market_posts")
+    .select(select, { count: "exact" })
+    .order("created_at", { ascending: false });
+
+  if (gameIdFilter !== null) {
+    query = query.eq("game_id", gameIdFilter);
+  }
+  if (useGenreFilter && filter?.genre) {
+    query = query.eq("game.genre", filter.genre);
+  }
+  if (filter?.status === "open" || filter?.status === "closed") {
+    query = query.eq("status", filter.status);
+  }
+
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(error.message);
+
+  const posts = ((data ?? []) as Array<unknown>).map((record) =>
+    mapMarketPostRecord(normalizeRecordShape(record))
+  );
+  return { posts, totalCount: count ?? 0 };
+}
+
+/**
+ * 회원 1명의 최근 게시글 (인라인 detail용). 기본 limit 20건.
+ * month YYYY-MM가 주어지면 해당 월로 한정.
+ */
+export async function listMemberPostsRecent({
+  memberId,
+  month,
+  limit = 20
+}: {
+  memberId: string;
+  month?: string | null;
+  limit?: number;
+}): Promise<{ posts: MarketPost[]; totalCount: number }> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("market_posts")
+    .select(MARKET_POST_LIST_SELECT, { count: "exact" })
+    .eq("author_id", memberId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (month) {
+    const start = new Date(`${month}-01T00:00:00Z`);
+    const end = new Date(start);
+    end.setUTCMonth(end.getUTCMonth() + 1);
+    query = query.gte("created_at", start.toISOString()).lt("created_at", end.toISOString());
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(error.message);
+
+  const posts = ((data ?? []) as Array<unknown>).map((record) =>
+    mapMarketPostRecord(normalizeRecordShape(record))
+  );
+  return { posts, totalCount: count ?? 0 };
 }

@@ -2,7 +2,7 @@ import type { GameBoardStat, GameGenre, MarketCategoryCode, MarketGameOption, Ma
 import { mapMarketPostRecord } from "./market-utils";
 import { createClient } from "./supabase/server";
 
-const MARKET_POST_LIST_SELECT = `
+export const MARKET_POST_LIST_SELECT = `
   id,
   author_id,
   trade_type,
@@ -18,10 +18,11 @@ const MARKET_POST_LIST_SELECT = `
   created_at,
   updated_at,
   closed_at,
-  game:games(id, slug, name),
+  game:games(id, slug, name, genre),
   profile:profiles!market_posts_author_id_fkey(nickname, role),
   market_comments(id, created_at)
 `;
+
 
 const MARKET_POST_DETAIL_SELECT = `
   id,
@@ -72,7 +73,7 @@ function ensureSingle<T>(value: T | T[] | null | undefined): T | null {
   return value ?? null;
 }
 
-function normalizeRecordShape(record: any): MarketPostRecord {
+export function normalizeRecordShape(record: any): MarketPostRecord {
   const comments = Array.isArray(record.market_comments)
     ? record.market_comments.map((comment: any) => ({
         ...comment,

@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Pagination } from "../../../components/Pagination";
 import { adminCloseMarketPostAction, adminDeleteMarketPostAction } from "../actions";
 import {
-  filterAdminPosts,
-  getAdminDashboardData,
   listAdminGames,
-  type AdminGameRow
+  listAdminPostsPaged
 } from "../../../lib/admin-server";
 import { isAdminProfile } from "../../../lib/auth-utils";
 import { getStatusLabel, getTradeTypeLabel } from "../../../lib/market-utils";
@@ -15,6 +14,8 @@ import type { GameGenre } from "../../../lib/types";
 export const metadata = {
   title: "게시물 관리 | ITEM ODIN STAFF"
 };
+
+const PAGE_SIZE = 20;
 
 const GENRE_LABELS: Record<GameGenre, string> = {
   mmorpg_pc: "PC MMORPG",
@@ -40,6 +41,11 @@ const GENRE_OPTIONS: GameGenre[] = [
   "other"
 ];
 
+function parsePage(raw: string | undefined): number {
+  const n = Number.parseInt(raw || "1", 10);
+  return Number.isFinite(n) && n >= 1 ? n : 1;
+}
+
 export default async function StaffPostsPage({
   searchParams
 }: {
@@ -48,6 +54,7 @@ export default async function StaffPostsPage({
     game?: string;
     genre?: string;
     message?: string;
+    page?: string;
     status?: string;
   }>;
 }) {
@@ -58,12 +65,6 @@ export default async function StaffPostsPage({
   }
 
   const params = await searchParams;
-  const [dashboard, games] = await Promise.all([getAdminDashboardData({}), listAdminGames()]);
-
-  const gamesBySlug: Record<string, AdminGameRow> = Object.fromEntries(
-    games.map((game) => [game.slug, game])
-  );
-
   const filterStatus =
     params.status === "open" || params.status === "closed" ? params.status : "all";
   const filterGameSlug = params.game && params.game !== "all" ? params.game : null;
@@ -71,22 +72,27 @@ export default async function StaffPostsPage({
     params.genre && GENRE_OPTIONS.includes(params.genre as GameGenre)
       ? (params.genre as GameGenre)
       : null;
+  const page = parsePage(params.page);
 
-  const visiblePosts = filterAdminPosts(
-    dashboard.posts,
-    {
-      gameSlug: filterGameSlug,
-      genre: filterGenre,
-      status: filterStatus
-    },
-    gamesBySlug
-  );
+  const [{ posts, totalCount }, games] = await Promise.all([
+    listAdminPostsPaged({
+      filter: {
+        gameSlug: filterGameSlug,
+        genre: filterGenre,
+        status: filterStatus
+      },
+      page,
+      pageSize: PAGE_SIZE
+    }),
+    listAdminGames()
+  ]);
 
   const buildHref = (overrides: Record<string, string | null>) => {
     const next = new URLSearchParams();
     if (filterStatus !== "all") next.set("status", filterStatus);
     if (filterGameSlug) next.set("game", filterGameSlug);
     if (filterGenre) next.set("genre", filterGenre);
+    if (page !== 1) next.set("page", String(page));
     for (const [key, value] of Object.entries(overrides)) {
       if (value === null) {
         next.delete(key);
@@ -98,13 +104,23 @@ export default async function StaffPostsPage({
     return qs ? `/staff/posts?${qs}` : "/staff/posts";
   };
 
+  const buildPageHref = (nextPage: number) => buildHref({ page: nextPage === 1 ? null : String(nextPage) });
+
+  const filterContextLabel = [
+    filterGameSlug ? games.find((g) => g.slug === filterGameSlug)?.name : null,
+    filterGenre ? GENRE_LABELS[filterGenre] : null,
+    filterStatus !== "all" ? (filterStatus === "open" ? "거래중" : "거래완료") : null
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <main>
       <section className="page-hero page-hero--compact">
         <div className="container">
           <p className="eyebrow">STAFF · POSTS</p>
           <h1>게시물 관리</h1>
-          <p>게임/장르/상태별로 거래 글을 필터링하고 관리합니다. 거래완료 처리와 삭제는 즉시 적용됩니다.</p>
+          <p>게임/장르/상태별로 거래 글을 필터링하고 관리합니다. 페이지당 20건씩 노출.</p>
         </div>
       </section>
 
@@ -168,6 +184,7 @@ export default async function StaffPostsPage({
                   <option value="closed">거래완료</option>
                 </select>
               </label>
+              {/* 필터 변경 시 페이지는 1로 초기화 (page input 미포함) */}
               <div className="admin-filter-actions">
                 <button className="button button--dark" type="submit">
                   필터 적용
@@ -182,37 +199,38 @@ export default async function StaffPostsPage({
               <div>
                 <p className="eyebrow">RESULTS</p>
                 <h2>
-                  {filterGameSlug ? gamesBySlug[filterGameSlug]?.name + " " : ""}
-                  {filterGenre ? GENRE_LABELS[filterGenre] + " " : ""}
-                  게시글 ({visiblePosts.length}건)
+                  {filterContextLabel ? `${filterContextLabel} ` : ""}게시글 ({totalCount.toLocaleString("ko-KR")}건)
                 </h2>
               </div>
               <nav className="staff-status-filter" aria-label="상태 빠른 필터">
-                <Link className={filterStatus === "all" ? "is-active" : undefined} href={buildHref({ status: null })}>
+                <Link className={filterStatus === "all" ? "is-active" : undefined} href={buildHref({ page: null, status: null })}>
                   전체
                 </Link>
                 <Link
                   className={filterStatus === "open" ? "is-active" : undefined}
-                  href={buildHref({ status: "open" })}
+                  href={buildHref({ page: null, status: "open" })}
                 >
                   거래중
                 </Link>
                 <Link
                   className={filterStatus === "closed" ? "is-active" : undefined}
-                  href={buildHref({ status: "closed" })}
+                  href={buildHref({ page: null, status: "closed" })}
                 >
                   거래완료
                 </Link>
               </nav>
             </div>
 
+            {/* 상단 페이지네이션 */}
+            <Pagination buildHref={buildPageHref} page={page} pageSize={PAGE_SIZE} totalCount={totalCount} />
+
             <div className="admin-list">
-              {visiblePosts.length === 0 ? (
+              {posts.length === 0 ? (
                 <div className="empty-state">
                   <strong>해당 조건의 게시글이 없습니다.</strong>
                 </div>
               ) : (
-                visiblePosts.map((post) => (
+                posts.map((post) => (
                   <article className="admin-list__row" key={post.id}>
                     <div className="admin-list__main">
                       <strong>
@@ -254,6 +272,9 @@ export default async function StaffPostsPage({
                 ))
               )}
             </div>
+
+            {/* 하단 페이지네이션 */}
+            <Pagination buildHref={buildPageHref} page={page} pageSize={PAGE_SIZE} totalCount={totalCount} />
           </section>
         </div>
       </section>
