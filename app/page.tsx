@@ -72,6 +72,27 @@ export default async function HomePage() {
                 판매등록
               </Link>
             </div>
+
+            <div className="hero__trust">
+              <p className="eyebrow">WHY ITEM ODIN</p>
+              <ul className="hero__trust-grid">
+                <li>
+                  <span aria-hidden="true" className="hero__trust-icon">🛡</span>
+                  <strong>신뢰등급 시스템</strong>
+                  <span>회원의 거래 이력으로 자동 등급. 활성/거래완료/응답 활동을 종합.</span>
+                </li>
+                <li>
+                  <span aria-hidden="true" className="hero__trust-icon">⏱</span>
+                  <strong>거래 진행 타임라인</strong>
+                  <span>등록 → 문의 → 거래중 → 완료 단계가 글마다 자동 기록.</span>
+                </li>
+                <li>
+                  <span aria-hidden="true" className="hero__trust-icon">✓</span>
+                  <strong>안전거래 체크리스트</strong>
+                  <span>서버/캐릭/수량 확인부터 정산까지 매 단계 점검 항목 노출.</span>
+                </li>
+              </ul>
+            </div>
           </div>
 
           <HeroFeaturePanel />
