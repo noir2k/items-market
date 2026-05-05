@@ -8,7 +8,7 @@ interface GameGenreSectionProps {
 
 const GENRE_LABELS: Record<GameGenre, { eyebrow: string; title: string; description?: string }> = {
   mmorpg_pc: {
-    description: "메이플스토리, 로스트아크, 던전앤파이터 등 PC MMORPG",
+    description: "메이플스토리, 로스트아크, 리니지/리니지2, 던전앤파이터 등 PC MMORPG",
     eyebrow: "MMORPG · PC",
     title: "PC MMORPG"
   },
@@ -18,12 +18,12 @@ const GENRE_LABELS: Record<GameGenre, { eyebrow: string; title: string; descript
     title: "모바일 MMORPG"
   },
   rpg_mobile: {
-    description: "원신, 명일방주 등 수집형/스토리 모바일 RPG",
+    description: "원신, 명조, 붕괴: 스타레일 등 오픈월드 / 가챠 RPG",
     eyebrow: "RPG · MOBILE",
     title: "모바일 RPG"
   },
   action: {
-    description: "디아블로 시리즈 등 액션 RPG",
+    description: "POE, 디아블로 시리즈 등 핵 앤 슬래시 액션 RPG",
     eyebrow: "ACTION",
     title: "액션 RPG"
   },
@@ -38,6 +38,7 @@ const GENRE_LABELS: Record<GameGenre, { eyebrow: string; title: string; descript
     title: "FPS / 슈팅"
   },
   moba: {
+    description: "리그 오브 레전드 등 멀티플레이어 온라인 배틀 아레나",
     eyebrow: "MOBA",
     title: "MOBA"
   },

@@ -64,6 +64,64 @@ const icons = [
   [
     "diablo4",
     "https://www.google.com/s2/favicons?domain_url=https://diablo4.blizzard.com&sz=128"
+  ],
+
+  // ── 2026-05-05 확장 (28개로 확장) ──
+
+  // PC MMORPG 클래식
+  [
+    "lineage1",
+    "https://www.google.com/s2/favicons?domain_url=https://lineage.plaync.com&sz=128"
+  ],
+  [
+    "lineage-classic",
+    "https://www.google.com/s2/favicons?domain_url=https://lineage.plaync.com&sz=128"
+  ],
+  [
+    "lineage2",
+    "https://www.google.com/s2/favicons?domain_url=https://lineage2.plaync.com&sz=128"
+  ],
+
+  // 모바일 RPG — 최신 오픈월드 / 가챠
+  [
+    "wuwa",
+    "https://www.google.com/s2/favicons?domain_url=https://wutheringwaves.kurogames.com&sz=128"
+  ],
+  [
+    "endfield",
+    "https://www.google.com/s2/favicons?domain_url=https://endfield.gryphline.com&sz=128"
+  ],
+  [
+    "hsr",
+    "https://www.google.com/s2/favicons?domain_url=https://hsr.hoyoverse.com&sz=128"
+  ],
+  [
+    "nikke",
+    "https://www.google.com/s2/favicons?domain_url=https://nikke-kr.com&sz=128"
+  ],
+
+  // 액션 RPG — POE 시리즈 + 디아블로 구작
+  [
+    "poe",
+    "https://www.google.com/s2/favicons?domain_url=https://www.pathofexile.com&sz=128"
+  ],
+  [
+    "poe2",
+    "https://www.google.com/s2/favicons?domain_url=https://www.pathofexile.com&sz=128"
+  ],
+  [
+    "diablo2",
+    "https://www.google.com/s2/favicons?domain_url=https://diablo2.blizzard.com&sz=128"
+  ],
+  [
+    "diablo3",
+    "https://www.google.com/s2/favicons?domain_url=https://diablo3.blizzard.com&sz=128"
+  ],
+
+  // MOBA
+  [
+    "lol",
+    "https://www.google.com/s2/favicons?domain_url=https://www.leagueoflegends.com&sz=128"
   ]
 ];
 
