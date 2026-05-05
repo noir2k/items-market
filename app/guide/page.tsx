@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "이용안내 | ITEMMARKET"
+  title: "이용안내 | ITEM ODIN"
 };
 
 const steps = [

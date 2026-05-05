@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="ITEM ODIN">
+  <title>ITEM ODIN</title>
+  <defs>
+    <linearGradient id="aio-bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="aio-gold" x1="0" y1="0" x2="0" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#b58a1f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 라운드 배경 (iOS는 자체 마스크가 있지만 안전하게 풀 라운드 적용) -->
+  <rect width="180" height="180" rx="40" fill="url(#aio-bg)"/>
+
+  <!-- O: 골드 링 -->
+  <circle cx="90" cy="90" r="46" fill="none" stroke="url(#aio-gold)" stroke-width="14"/>
+
+  <!-- Gungnir: 창대 -->
+  <rect x="14" y="84" width="152" height="12" rx="3" fill="url(#aio-gold)"/>
+  <!-- 창끝 -->
+  <polygon points="154,72 176,90 154,108" fill="url(#aio-gold)"/>
+  <!-- 창미 -->
+  <polygon points="4,82 16,90 4,98" fill="url(#aio-gold)"/>
+
+  <!-- 텍스트 워드마크: 큰 캔버스라 ITEM ODIN 표기 가능 -->
+  <text x="90" y="158" text-anchor="middle"
+        font-family="'Plus Jakarta Sans', system-ui, sans-serif"
+        font-weight="700" font-size="14" letter-spacing="3"
+        fill="#fbbf24">ITEM ODIN</text>
+</svg>

@@ -17,7 +17,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "ITEMMARKET",
+  title: "ITEM ODIN",
   description:
     "게임 아이템, 게임머니, 계정 거래를 위한 마켓 서비스"
 };

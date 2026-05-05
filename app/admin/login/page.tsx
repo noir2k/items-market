@@ -7,7 +7,7 @@ import { isAdminProfile, sanitizeRedirectPath } from "../../../lib/auth-utils";
 import { getAuthHiddenFields } from "../../../lib/navigation-utils";
 
 export const metadata = {
-  title: "관리자 로그인 | ITEMMARKET"
+  title: "관리자 로그인 | ITEM ODIN"
 };
 
 export default async function AdminLoginPage({

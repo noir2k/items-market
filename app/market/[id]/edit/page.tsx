@@ -8,7 +8,7 @@ import { getCurrentProfile } from "../../../../lib/supabase/server";
 import { MarketPostForm } from "../../../../components/MarketPostForm";
 
 export const metadata = {
-  title: "거래 글 수정 | ITEMMARKET"
+  title: "거래 글 수정 | ITEM ODIN"
 };
 
 export default async function EditMarketPostPage({

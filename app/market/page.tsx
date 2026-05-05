@@ -5,7 +5,7 @@ import { listGameBoardStats } from "../../lib/market-server";
 import type { GameBoardStat, GameGenre } from "../../lib/types";
 
 export const metadata = {
-  title: "거래소 | ITEMMARKET"
+  title: "거래소 | ITEM ODIN"
 };
 
 function groupStatsByGenre(stats: GameBoardStat[]): Map<GameGenre, GameBoardStat[]> {

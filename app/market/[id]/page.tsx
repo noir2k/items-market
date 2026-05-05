@@ -20,13 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!item) {
     return {
-      title: "거래 상세 | ITEMMARKET"
+      title: "거래 상세 | ITEM ODIN"
     };
   }
 
   return {
     description: `${item.game} ${item.server} 거래 상세 페이지`,
-    title: `${item.title} | ITEMMARKET`
+    title: `${item.title} | ITEM ODIN`
   };
 }
 

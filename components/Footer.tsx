@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="container site-footer__inner">
         <div>
-          <strong>ITEMMARKET</strong>
+          <strong>ITEM ODIN</strong>
           <p>게임 아이템 · 게임머니 · 계정 거래 마켓</p>
         </div>
         <div className="footer-links">

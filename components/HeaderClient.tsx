@@ -31,9 +31,9 @@ export function HeaderClient({
     <header className={`site-header${isOpen ? " is-open" : ""}`}>
       <div className="container site-header__inner">
         <Link className="brand" href="/" onClick={() => setIsOpen(false)}>
-          <span className="brand__mark">IM</span>
+          <span className="brand__mark">IO</span>
           <span className="brand__text">
-            <strong>ITEMMARKET</strong>
+            <strong>ITEM ODIN</strong>
             <small>game trade market</small>
           </span>
         </Link>

@@ -5,7 +5,7 @@ import { listMarketGameOptions } from "../../lib/market-server";
 import { getCurrentProfile } from "../../lib/supabase/server";
 
 export const metadata = {
-  title: "판매등록 | ITEMMARKET"
+  title: "판매등록 | ITEM ODIN"
 };
 
 export default async function SellPage({

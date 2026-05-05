@@ -16,7 +16,7 @@ import { TrustBadge } from "../../components/TrustBadge";
 import { getCurrentProfile } from "../../lib/supabase/server";
 
 export const metadata = {
-  title: "관리자 | ITEMMARKET"
+  title: "관리자 | ITEM ODIN"
 };
 
 function SummaryCard({ label, value }: { label: string; value: number }) {

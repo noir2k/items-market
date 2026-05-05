@@ -5,7 +5,7 @@ import { signUpAction } from "../auth/actions";
 import { getCurrentSession } from "../../lib/supabase/server";
 
 export const metadata = {
-  title: "회원가입 | ITEMMARKET"
+  title: "회원가입 | ITEM ODIN"
 };
 
 export default async function SignupPage({

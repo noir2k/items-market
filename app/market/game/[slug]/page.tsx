@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!game) {
     return {
-      title: "게임 게시판 | ITEMMARKET"
+      title: "게임 게시판 | ITEM ODIN"
     };
   }
 
   return {
     description: `${game.name} 삽니다 / 팝니다 거래 게시판`,
-    title: `${game.name} 게시판 | ITEMMARKET`
+    title: `${game.name} 게시판 | ITEM ODIN`
   };
 }
 

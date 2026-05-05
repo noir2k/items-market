@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ITEM ODIN">
+  <title>ITEM ODIN</title>
+  <defs>
+    <linearGradient id="io-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="io-gold" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#b58a1f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 라운드 배경: 미드나잇 네이비 그라디언트 -->
+  <rect width="64" height="64" rx="14" fill="url(#io-bg)"/>
+
+  <!-- O: Odin / 방패 — 두꺼운 골드 링 -->
+  <circle cx="32" cy="32" r="16" fill="none" stroke="url(#io-gold)" stroke-width="5"/>
+
+  <!-- Gungnir(오딘의 창): O를 가로로 관통 -->
+  <!-- 창대 -->
+  <rect x="4" y="30.4" width="56" height="3.2" rx="1.2" fill="url(#io-gold)"/>
+  <!-- 창끝 (오른쪽) -->
+  <polygon points="55,25 63,32 55,39" fill="url(#io-gold)"/>
+  <!-- 창미 (왼쪽 작은 꼬리) -->
+  <polygon points="1,29 5,32 1,35" fill="url(#io-gold)"/>
+</svg>

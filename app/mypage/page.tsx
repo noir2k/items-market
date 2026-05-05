@@ -11,7 +11,7 @@ import { getActivityLabel, getMembershipLabel, getSuccessRate, getTrustBadge } f
 import { TrustBadge } from "../../components/TrustBadge";
 
 export const metadata = {
-  title: "마이페이지 | ITEMMARKET"
+  title: "마이페이지 | ITEM ODIN"
 };
 
 export default async function MyPage({
