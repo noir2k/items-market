@@ -810,11 +810,21 @@ label,
 .game-tag-large {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.game-tag-large__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.55);
+  flex-shrink: 0;
 }
 
 .game-hub-card.game-tag--maplestory   .game-tag-large { background: rgba(255, 138, 0, 0.16);   color: var(--game-maple); }
@@ -917,6 +927,14 @@ label,
   color: var(--primary);
 }
 
+.game-quicknav__icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .game-quicknav__item strong {
   font-size: 0.84rem;
   font-weight: 800;
@@ -1009,11 +1027,20 @@ label,
 .game-tag {
   display: inline-flex;
   align-items: center;
+  gap: 5px;
   padding: 2px 10px;
   border-radius: var(--radius-pill);
   font-size: 0.86rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.game-tag__icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .game-tag--maplestory { background: rgba(255, 138, 0, 0.16);   color: var(--game-maple); }

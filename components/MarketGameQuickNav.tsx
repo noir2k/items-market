@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getGameIconUrl } from "../lib/game-icon";
 import { getGameTagClass } from "../lib/market-utils";
 import type { GameBoardStat } from "../lib/types";
 
@@ -39,12 +40,16 @@ export function MarketGameQuickNav({ activeSlug, limit = 4, stats }: MarketGameQ
         {top.map((stat) => {
           const isActive = activeSlug === stat.game.slug;
           const colorClass = isActive ? "game-quicknav__item--active" : getGameTagClass(stat.game.slug);
+          const iconUrl = getGameIconUrl(stat.game.iconPath);
           return (
             <Link
               className={`game-quicknav__item ${colorClass}`}
               href={`/market/game/${stat.game.slug}`}
               key={stat.game.slug}
             >
+              {iconUrl ? (
+                <img alt="" aria-hidden="true" className="game-quicknav__icon" src={iconUrl} />
+              ) : null}
               <span>{stat.game.name}</span>
               <strong>{stat.openPosts}</strong>
             </Link>

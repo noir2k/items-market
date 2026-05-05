@@ -9,7 +9,8 @@
     "staging:check": "tsx scripts/check-staging.ts",
     "test": "vitest run",
     "supabase:bootstrap": "tsx scripts/bootstrap-local-supabase.ts",
-    "supabase:reset": "tsx scripts/reset-local-data.ts"
+    "supabase:reset": "tsx scripts/reset-local-data.ts",
+    "supabase:upload-icons": "tsx scripts/upload-game-icons.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

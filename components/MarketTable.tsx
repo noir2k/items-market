@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getGameIconUrlBySlug } from "../lib/game-icon";
 import { getGameTagClass, getStatusLabel, getTradeTypeLabel } from "../lib/market-utils";
 import type { MarketPost } from "../lib/types";
 
@@ -20,7 +21,15 @@ export function MarketTable({ items }: { items: MarketPost[] }) {
               <Link href={`/market/${item.id}`}>{item.title}</Link>
             </strong>
             <div className="market-table__meta">
-              <span className={`game-tag ${getGameTagClass(item.gameSlug)}`}>{item.game}</span>
+              <span className={`game-tag ${getGameTagClass(item.gameSlug)}`}>
+                {(() => {
+                  const iconUrl = getGameIconUrlBySlug(item.gameSlug);
+                  return iconUrl ? (
+                    <img alt="" aria-hidden="true" className="game-tag__icon" src={iconUrl} />
+                  ) : null;
+                })()}
+                {item.game}
+              </span>
               {" · "}
               {item.server} · {item.category} · {item.quantity}
             </div>
