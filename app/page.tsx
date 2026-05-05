@@ -204,11 +204,11 @@ export default async function HomePage() {
         <div className="container info-grid">
           <article className="panel panel--dark">
             <p className="eyebrow eyebrow--light">SERVICE</p>
-            <h2>빠른 검색, 실시간 거래, 안전거래 절차를 한 화면에서</h2>
+            <h2>28개 게임 거래소 + 신뢰 시스템으로 매 단계 안전하게</h2>
             <ul className="bullet-list bullet-list--light">
-              <li>카테고리별 거래소 탐색과 상세 페이지 이동</li>
-              <li>판매등록 / 구매등록으로 이어지는 양면 거래 구조</li>
-              <li>공지사항과 안전거래 안내를 함께 배치한 메인 구성</li>
+              <li>PC MMORPG · 모바일 RPG · MOBA까지 28개 게임을 장르별 허브에서 한눈에</li>
+              <li>팝니다 · 삽니다 양방향 등록 + 댓글 즉시 협상으로 거래 흐름 단축</li>
+              <li>신뢰등급 뱃지 · 거래 진행 타임라인 · 안전거래 체크리스트로 단계별 검증</li>
             </ul>
           </article>
 
