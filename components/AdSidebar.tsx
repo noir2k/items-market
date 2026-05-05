@@ -31,12 +31,44 @@ const SLOTS: AdSlotConfig[] = [
   }
 ];
 
+interface AdRailProps {
+  side: "left" | "right";
+}
+
+function AdRail({ side }: AdRailProps) {
+  return (
+    <aside
+      aria-label={`${side === "left" ? "좌측" : "우측"} 광고 영역 (placeholder)`}
+      className={`ad-rail ad-rail--${side}`}
+    >
+      <p className="ad-rail__heading">SPONSORED</p>
+      {SLOTS.map((slot) => (
+        <div
+          aria-hidden="true"
+          className="ad-rail__slot"
+          key={`${side}-${slot.size}-${slot.label}`}
+          style={{ height: `${slot.height}px`, width: `${slot.width}px` }}
+          title={slot.hint}
+        >
+          <span className="ad-rail__slot-tag">광고</span>
+          <strong>{slot.label}</strong>
+          <span className="ad-rail__slot-size">{slot.size}</span>
+          {slot.hint ? <span className="ad-rail__slot-note">{slot.hint}</span> : null}
+        </div>
+      ))}
+    </aside>
+  );
+}
+
 /**
- * 일반 사용자 페이지(거래소/메인/마이페이지 등) 우측에 노출되는 광고 영역 placeholder.
+ * 일반 사용자 페이지 양쪽(좌+우) 광고 placeholder.
  *
- * - /staff/* (관리자 콘솔)에서는 렌더하지 않음
- * - viewport 1500px 미만에서는 CSS로 hide (광고 폭 + 메인 container 1200px 합산 후 여유 영역)
- * - 실제 광고 SDK 통합 전 미리보기를 위한 hatched 패턴 placeholder
+ * 정책 (사용자 요청 — ruliweb 패턴 참고):
+ *   1. 메인 영역(.container max-width 1200px)을 절대 가리지 않는다
+ *   2. position: absolute (sticky/fixed 아님) — 스크롤 시 페이지와 함께 흐름
+ *   3. viewport 1850px 이상 = main 1200 + (gap 24 + 광고 300) × 2 = 1848 fits
+ *      → 그보다 좁으면 자동 hide되어 메인 영역만 가시
+ *   4. /staff/* 콘솔에서는 노출하지 않음
  */
 export function AdSidebar() {
   const pathname = usePathname();
@@ -46,25 +78,9 @@ export function AdSidebar() {
   }
 
   return (
-    <aside aria-label="광고 영역 (실제 광고 통합 전 placeholder)" className="ad-sidebar">
-      <p className="ad-sidebar__heading">SPONSORED · 광고 영역 미리보기</p>
-      {SLOTS.map((slot) => (
-        <div
-          aria-hidden="true"
-          className="ad-sidebar__slot"
-          key={`${slot.size}-${slot.label}`}
-          style={{ height: `${slot.height}px`, width: `${slot.width}px` }}
-          title={slot.hint}
-        >
-          <span className="ad-sidebar__slot-tag">광고</span>
-          <strong>{slot.label}</strong>
-          <span className="ad-sidebar__slot-size">{slot.size}</span>
-          {slot.hint ? <span className="ad-sidebar__slot-note">{slot.hint}</span> : null}
-        </div>
-      ))}
-      <p className="ad-sidebar__footer">
-        실제 광고 통합 전 placeholder입니다.
-      </p>
-    </aside>
+    <>
+      <AdRail side="left" />
+      <AdRail side="right" />
+    </>
   );
 }

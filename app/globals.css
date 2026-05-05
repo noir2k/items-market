@@ -107,6 +107,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  position: relative; /* .ad-rail (absolute) 기준 컨테이너 */
   background:
     radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 24rem),
     linear-gradient(180deg, #f9fbff 0%, var(--bg) 100%);
@@ -2481,30 +2482,42 @@ label,
 }
 
 /* ════════════════════════════════════════════════════════════════ */
-/* 광고 영역 placeholder (sponsored sidebar) — 일반 사용자 페이지 우측 */
+/* 광고 영역 placeholder — 일반 페이지 양쪽(좌+우) 사이드 광고 rail   */
+/*                                                                   */
+/* 정책 (ruliweb 류 참고):                                             */
+/*   - 메인 영역(.container max-width 1200px)을 절대 가리지 않는다       */
+/*   - position: absolute (sticky/fixed 아님) — 스크롤 시 페이지와 흐름  */
+/*   - viewport 1850px 미만 = 광고 + 메인 합치면 좁아 자동 hide        */
 /* ════════════════════════════════════════════════════════════════ */
 
-.ad-sidebar {
-  display: none; /* viewport gate: 1500px+ 에서만 표시 */
-  position: fixed;
-  right: 24px;
-  top: 96px;
+.ad-rail {
+  display: none; /* viewport gate */
+  position: absolute;
+  top: 120px; /* header 70 + topbar 50 정도 below */
   z-index: 5;
   flex-direction: column;
   gap: 16px;
   width: 300px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  scrollbar-width: thin;
 }
 
-@media (min-width: 1500px) {
-  .ad-sidebar {
+/* 좌광고: 메인 컨테이너 좌측에 정렬. (100vw - 1200) / 2 - 324 만큼 안쪽으로 */
+.ad-rail--left {
+  left: max(8px, calc((100vw - 1200px) / 2 - 324px));
+}
+
+/* 우광고: 우측 동일 계산 */
+.ad-rail--right {
+  right: max(8px, calc((100vw - 1200px) / 2 - 324px));
+}
+
+/* main 1200 + (gap 24 + 광고 300) × 2 = 1848 → 1850px+ 에서 양쪽 노출 */
+@media (min-width: 1850px) {
+  .ad-rail {
     display: flex;
   }
 }
 
-.ad-sidebar__heading {
+.ad-rail__heading {
   margin: 0;
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-size: 0.72rem;
@@ -2519,7 +2532,7 @@ label,
   align-self: start;
 }
 
-.ad-sidebar__slot {
+.ad-rail__slot {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2541,7 +2554,7 @@ label,
   flex-shrink: 0;
 }
 
-.ad-sidebar__slot-tag {
+.ad-rail__slot-tag {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -2552,7 +2565,7 @@ label,
   border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.ad-sidebar__slot strong {
+.ad-rail__slot strong {
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-weight: 800;
   font-size: 0.95rem;
@@ -2561,27 +2574,18 @@ label,
   margin-top: 4px;
 }
 
-.ad-sidebar__slot-size {
+.ad-rail__slot-size {
   font-size: 0.84rem;
   color: var(--muted);
   font-weight: 600;
 }
 
-.ad-sidebar__slot-note {
+.ad-rail__slot-note {
   font-size: 0.72rem;
   color: var(--muted);
   margin-top: 8px;
   padding: 0 8px;
   line-height: 1.4;
-}
-
-.ad-sidebar__footer {
-  margin: 0;
-  font-size: 0.7rem;
-  color: var(--muted);
-  text-align: center;
-  padding: 6px 0;
-  font-style: italic;
 }
 
 /* ════════════════════════════════════════════════════════════════ */
