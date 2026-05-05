@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TrustBadge } from "../../../components/TrustBadge";
 import { signOutAction } from "../../auth/actions";
-import { updateMemberStatusAction } from "../actions";
+import { impersonateMemberAction, updateMemberStatusAction } from "../actions";
 import { formatMonthOption } from "../../../lib/admin-utils";
 import { getAdminDashboardData } from "../../../lib/admin-server";
 import { getMemberStatusLabel, getRoleLabel, isAdminProfile } from "../../../lib/auth-utils";
@@ -106,18 +106,33 @@ export default async function StaffMembersPage({
                     <div className="admin-actions">
                       {member.id === user.id ? (
                         <span className="muted">본인 계정</span>
-                      ) : member.status === "active" ? (
-                        <form action={updateMemberStatusAction.bind(null, member.id, "suspended")}>
-                          <button className="button button--light" type="submit">
-                            회원 정지
-                          </button>
-                        </form>
                       ) : (
-                        <form action={updateMemberStatusAction.bind(null, member.id, "active")}>
-                          <button className="button button--light" type="submit">
-                            정지 해제
-                          </button>
-                        </form>
+                        <>
+                          {member.role !== "admin" && member.status === "active" ? (
+                            <form action={impersonateMemberAction.bind(null, member.id)}>
+                              <button
+                                className="button button--light"
+                                title="이 계정으로 세션을 교체하여 일반 사용자 화면을 확인합니다. 관리자 복귀 가능."
+                                type="submit"
+                              >
+                                가장 로그인
+                              </button>
+                            </form>
+                          ) : null}
+                          {member.status === "active" ? (
+                            <form action={updateMemberStatusAction.bind(null, member.id, "suspended")}>
+                              <button className="button button--light" type="submit">
+                                회원 정지
+                              </button>
+                            </form>
+                          ) : (
+                            <form action={updateMemberStatusAction.bind(null, member.id, "active")}>
+                              <button className="button button--light" type="submit">
+                                정지 해제
+                              </button>
+                            </form>
+                          )}
+                        </>
                       )}
                     </div>
                   </article>

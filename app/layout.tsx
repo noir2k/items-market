@@ -3,6 +3,7 @@ import { Noto_Sans_KR, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
+import { ImpersonationBanner } from "../components/ImpersonationBanner";
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
       <body className={`${notoSansKr.variable} ${plusJakartaSans.variable}`}>
+        <ImpersonationBanner />
         <Header />
         {children}
         <Footer />

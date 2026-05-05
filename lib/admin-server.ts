@@ -139,6 +139,28 @@ interface RawAdminGameRow {
   is_active: boolean;
 }
 
+export interface AdminPostFilter {
+  gameSlug?: string | null;
+  genre?: GameGenre | null;
+  status?: "open" | "closed" | "all" | null;
+}
+
+export function filterAdminPosts(posts: MarketPost[], filter: AdminPostFilter, gamesBySlug: Record<string, AdminGameRow>): MarketPost[] {
+  return posts.filter((post) => {
+    if (filter.gameSlug && filter.gameSlug !== "all") {
+      if (post.gameSlug !== filter.gameSlug) return false;
+    }
+    if (filter.genre && filter.genre !== ("all" as GameGenre)) {
+      const game = post.gameSlug ? gamesBySlug[post.gameSlug] : undefined;
+      if (!game || game.genre !== filter.genre) return false;
+    }
+    if (filter.status && filter.status !== "all") {
+      if (post.status !== filter.status) return false;
+    }
+    return true;
+  });
+}
+
 export async function listAdminGames(): Promise<AdminGameRow[]> {
   const supabase = await createClient();
 

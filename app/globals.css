@@ -2277,3 +2277,116 @@ label,
     flex-shrink: 0;
   }
 }
+
+/* 게시판 추가/수정 폼 */
+.staff-game-form {
+  display: grid;
+  grid-template-columns: 160px 1fr 200px 140px;
+  gap: var(--space-3) var(--space-4);
+  align-items: end;
+}
+
+.staff-game-form .field {
+  margin: 0;
+}
+
+.staff-game-form .field span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.staff-game-form .field input,
+.staff-game-form .field select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.92rem;
+  background: var(--surface);
+}
+
+.staff-game-form .field input:disabled {
+  background: var(--surface-muted);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.staff-game-form__icon {
+  grid-column: 1 / -2;
+}
+
+.staff-game-form__submit {
+  display: flex;
+  justify-content: end;
+}
+
+@media (max-width: 1080px) {
+  .staff-game-form {
+    grid-template-columns: 1fr 1fr;
+  }
+  .staff-game-form__icon,
+  .staff-game-form__submit {
+    grid-column: 1 / -1;
+  }
+}
+
+/* placeholder 아이콘 (icon_path 없을 때) */
+.staff-game-row__icon--placeholder {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: var(--surface-muted);
+}
+
+/* 가장 로그인 배너 — 모든 페이지 상단 sticky */
+.impersonation-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-bottom: 2px solid #f59e0b;
+  padding: 10px 0;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.18);
+}
+
+.impersonation-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.impersonation-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #78350f;
+  flex: 1;
+  min-width: 280px;
+}
+
+.impersonation-banner__text strong {
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.impersonation-banner__text span {
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.impersonation-banner__text b {
+  font-weight: 700;
+  color: #92400e;
+}
+
+.impersonation-banner .button {
+  flex-shrink: 0;
+}
