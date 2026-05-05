@@ -11,6 +11,7 @@ export async function Header() {
 
   return (
     <HeaderClient
+      isAdmin={isAdmin}
       isAuthenticated={isAuthenticated}
       navItems={getHeaderNavItems({ isAdmin, isAuthenticated })}
       profileNickname={profile?.nickname || null}

@@ -323,6 +323,22 @@ label,
   background: rgba(255, 255, 255, 0.86);
 }
 
+/* 관리자 콘솔 진입 버튼 — 일반 nav에 노출되지만 시각적으로 distinct.
+   다크 네이비 배경 + 골드 보더로 staff 콘솔 헤더와 시각 일관성 부여. */
+.button--staff {
+  background: linear-gradient(135deg, #0b1220 0%, #1e293b 100%);
+  color: #fbbf24;
+  border-color: #fbbf24;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+}
+
+.button--staff:hover {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #fde68a;
+}
+
 .button--full {
   width: 100%;
 }

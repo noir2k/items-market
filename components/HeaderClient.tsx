@@ -14,11 +14,13 @@ function isActive(pathname: string, href: string) {
 }
 
 export function HeaderClient({
+  isAdmin,
   isAuthenticated,
   navItems,
   profileNickname,
   signOutAction
 }: {
+  isAdmin: boolean;
   isAuthenticated: boolean;
   navItems: NavItem[];
   profileNickname: string | null;
@@ -89,6 +91,16 @@ export function HeaderClient({
               <Link className="text-link" href="/mypage" onClick={() => setIsOpen(false)}>
                 {profileNickname || "내 계정"}
               </Link>
+              {isAdmin ? (
+                <Link
+                  className="button button--staff"
+                  href="/staff"
+                  onClick={() => setIsOpen(false)}
+                  title="관리자 콘솔로 이동"
+                >
+                  관리자 콘솔
+                </Link>
+              ) : null}
               <form action={signOutAction}>
                 <button className="button button--dark" type="submit">
                   로그아웃
