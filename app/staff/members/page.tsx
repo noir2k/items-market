@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import { redirect } from "next/navigation";
 import { TrustBadge } from "../../../components/TrustBadge";
 import { signOutAction } from "../../auth/actions";
@@ -64,6 +65,22 @@ export default async function StaffMembersPage({
     filter.status !== "all" ||
     filter.activity !== "all" ||
     Boolean(filter.gameSlug);
+
+  /**
+   * 필터 상태를 보존한 채 memberId만 토글하는 URL 빌더.
+   * 현재 회원이 이미 선택된 상태에서 다시 클릭하면 detail 패널을 닫는다 (memberIdParam=null).
+   */
+  const buildMemberHref = (memberIdParam: string | null): string => {
+    const next = new URLSearchParams();
+    if (filter.search) next.set("search", filter.search);
+    if (filter.status && filter.status !== "all") next.set("status", filter.status);
+    if (filter.activity && filter.activity !== "all") next.set("activity", filter.activity);
+    if (filter.gameSlug) next.set("game", filter.gameSlug);
+    if (memberIdParam) next.set("memberId", memberIdParam);
+    const qs = next.toString();
+    const base = qs ? `/staff/members?${qs}` : "/staff/members";
+    return memberIdParam ? `${base}#member-row-${memberIdParam}` : base;
+  };
 
   return (
     <main>
@@ -184,151 +201,147 @@ export default async function StaffMembersPage({
                       totalPosts: trust.totalPosts
                     })
                   : null;
+                const isSelected = params.memberId === member.id;
                 return (
-                  <article
-                    className={`admin-list__row${params.memberId === member.id ? " admin-list__row--active" : ""}`}
-                    key={member.id}
-                  >
-                    <div className="admin-list__main">
-                      <strong>
-                        <Link href={`/staff/members?memberId=${encodeURIComponent(member.id)}`}>
-                          {member.nickname}
-                        </Link>
-                        {trustBadge ? <> <TrustBadge kind={trustBadge.kind} label={trustBadge.label} /></> : null}
-                      </strong>
-                      <div className="market-table__meta">
-                        {member.email} · {getRoleLabel(member.role)} · 상태 {getMemberStatusLabel(member.status)}
+                  <Fragment key={member.id}>
+                    <article
+                      className={`admin-list__row${isSelected ? " admin-list__row--active" : ""}`}
+                      id={`member-row-${member.id}`}
+                    >
+                      <div className="admin-list__main">
+                        <strong>
+                          <Link
+                            href={buildMemberHref(isSelected ? null : member.id)}
+                            scroll={false}
+                            title={isSelected ? "상세 닫기" : "월별 게시글 조회 / Export 열기"}
+                          >
+                            {member.nickname}
+                          </Link>
+                          {trustBadge ? <> <TrustBadge kind={trustBadge.kind} label={trustBadge.label} /></> : null}
+                        </strong>
+                        <div className="market-table__meta">
+                          {member.email} · {getRoleLabel(member.role)} · 상태 {getMemberStatusLabel(member.status)}
+                        </div>
                       </div>
-                    </div>
-                    <div className="seller-stats">
-                      <span>전체 {member.postCount}</span>
-                      <span>거래중 {member.openPostCount}</span>
-                      <span>완료 {member.closedPostCount}</span>
-                    </div>
-                    <div className="admin-actions">
-                      {member.id === user.id ? (
-                        <span className="muted">본인 계정</span>
-                      ) : (
-                        <>
-                          {member.role !== "admin" && member.status === "active" ? (
-                            <form action={impersonateMemberAction.bind(null, member.id)}>
-                              <button
-                                className="button button--light"
-                                title="이 계정으로 세션을 교체하여 일반 사용자 화면을 확인합니다. 관리자 복귀 가능."
-                                type="submit"
-                              >
-                                가장 로그인
-                              </button>
-                            </form>
+                      <div className="seller-stats">
+                        <span>전체 {member.postCount}</span>
+                        <span>거래중 {member.openPostCount}</span>
+                        <span>완료 {member.closedPostCount}</span>
+                      </div>
+                      <div className="admin-actions">
+                        {member.id === user.id ? (
+                          <span className="muted">본인 계정</span>
+                        ) : (
+                          <>
+                            {member.role !== "admin" && member.status === "active" ? (
+                              <form action={impersonateMemberAction.bind(null, member.id)}>
+                                <button
+                                  className="button button--light"
+                                  title="이 계정으로 세션을 교체하여 일반 사용자 화면을 확인합니다. 관리자 복귀 가능."
+                                  type="submit"
+                                >
+                                  가장 로그인
+                                </button>
+                              </form>
+                            ) : null}
+                            {member.status === "active" ? (
+                              <form action={updateMemberStatusAction.bind(null, member.id, "suspended")}>
+                                <button className="button button--light" type="submit">
+                                  회원 정지
+                                </button>
+                              </form>
+                            ) : (
+                              <form action={updateMemberStatusAction.bind(null, member.id, "active")}>
+                                <button className="button button--light" type="submit">
+                                  정지 해제
+                                </button>
+                              </form>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </article>
+
+                    {/* ── 선택된 회원의 인라인 상세 (월별 게시글 + Export) ── */}
+                    {isSelected && dashboard.selectedMember ? (
+                      <article className="admin-list__detail">
+                        <header className="admin-list__detail-head">
+                          <div>
+                            <p className="eyebrow">MEMBER POSTS</p>
+                            <h3>{dashboard.selectedMember.nickname}님의 월별 게시글 / Export</h3>
+                          </div>
+                          <Link className="text-link" href={buildMemberHref(null)} scroll={false}>
+                            상세 닫기 ×
+                          </Link>
+                        </header>
+
+                        <form action="/staff/members" className="board-toolbar board-toolbar--admin" method="get">
+                          <input name="memberId" type="hidden" value={dashboard.selectedMember.id} />
+                          {filter.search ? <input name="search" type="hidden" value={filter.search} /> : null}
+                          {filter.status && filter.status !== "all" ? (
+                            <input name="status" type="hidden" value={filter.status} />
                           ) : null}
-                          {member.status === "active" ? (
-                            <form action={updateMemberStatusAction.bind(null, member.id, "suspended")}>
-                              <button className="button button--light" type="submit">
-                                회원 정지
-                              </button>
-                            </form>
-                          ) : (
-                            <form action={updateMemberStatusAction.bind(null, member.id, "active")}>
-                              <button className="button button--light" type="submit">
-                                정지 해제
-                              </button>
-                            </form>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </article>
+                          {filter.activity && filter.activity !== "all" ? (
+                            <input name="activity" type="hidden" value={filter.activity} />
+                          ) : null}
+                          {filter.gameSlug ? <input name="game" type="hidden" value={filter.gameSlug} /> : null}
+                          <label className="field">
+                            <span>조회 월</span>
+                            <select defaultValue={params.month || ""} name="month">
+                              <option value="">전체 기간</option>
+                              {dashboard.monthOptions.map((month) => (
+                                <option key={month} value={month}>
+                                  {formatMonthOption(month)}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <div className="admin-filter-actions">
+                            <button className="button button--dark" type="submit">
+                              월 필터 적용
+                            </button>
+                            <Link
+                              className="button button--light"
+                              href={`/staff/export?memberId=${encodeURIComponent(dashboard.selectedMember.id)}${params.month ? `&month=${encodeURIComponent(params.month)}` : ""}`}
+                            >
+                              CSV Export
+                            </Link>
+                          </div>
+                        </form>
+
+                        {dashboard.selectedMemberPosts.length > 0 ? (
+                          <div className="admin-list admin-list--nested">
+                            {dashboard.selectedMemberPosts.map((post) => (
+                              <article className="admin-list__row" key={`member-post-${post.id}`}>
+                                <div className="admin-list__main">
+                                  <strong>
+                                    <Link href={`/market/${post.id}`}>{post.title}</Link>
+                                  </strong>
+                                  <div className="market-table__meta">
+                                    {post.createdAt} · {post.game} · {post.server} · {post.quantity}
+                                  </div>
+                                </div>
+                                <div className="seller-stats">
+                                  <span>{getTradeTypeLabel(post.tradeType)}</span>
+                                  <span>{getStatusLabel(post.status)}</span>
+                                  <span>댓글 {post.commentCount}</span>
+                                  <span>{post.price}</span>
+                                </div>
+                              </article>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="empty-state empty-state--compact">
+                            <strong>선택한 조건에 맞는 게시글이 없습니다.</strong>
+                            <p>다른 월을 선택하거나 다른 회원을 클릭해 주세요.</p>
+                          </div>
+                        )}
+                      </article>
+                    ) : null}
+                  </Fragment>
                 );
               })}
             </div>
-          </section>
-
-          <section className="panel">
-            <div className="section-heading section-heading--compact">
-              <div>
-                <p className="eyebrow">MEMBER POSTS</p>
-                <h2>회원별 게시글 조회 / Export</h2>
-              </div>
-            </div>
-
-            {dashboard.selectedMember ? (
-              <>
-                <div className="notice-list">
-                  <div>
-                    <strong>선택 회원</strong>
-                    <p>
-                      {dashboard.selectedMember.nickname} · {dashboard.selectedMember.email}
-                    </p>
-                  </div>
-                  <div>
-                    <strong>회원 상태</strong>
-                    <p>
-                      {getRoleLabel(dashboard.selectedMember.role)} ·{" "}
-                      {getMemberStatusLabel(dashboard.selectedMember.status)}
-                    </p>
-                  </div>
-                </div>
-
-                <form action="/staff/members" className="board-toolbar board-toolbar--admin">
-                  <input name="memberId" type="hidden" value={dashboard.selectedMember.id} />
-                  <label className="field">
-                    <span>조회 월</span>
-                    <select defaultValue={params.month || ""} name="month">
-                      <option value="">전체 기간</option>
-                      {dashboard.monthOptions.map((month) => (
-                        <option key={month} value={month}>
-                          {formatMonthOption(month)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <div className="admin-filter-actions">
-                    <button className="button button--dark" type="submit">
-                      월 필터 적용
-                    </button>
-                    <Link
-                      className="button button--light"
-                      href={`/staff/export?memberId=${encodeURIComponent(dashboard.selectedMember.id)}${params.month ? `&month=${encodeURIComponent(params.month)}` : ""}`}
-                    >
-                      CSV Export
-                    </Link>
-                  </div>
-                </form>
-
-                {dashboard.selectedMemberPosts.length > 0 ? (
-                  <div className="admin-list">
-                    {dashboard.selectedMemberPosts.map((post) => (
-                      <article className="admin-list__row" key={`member-post-${post.id}`}>
-                        <div className="admin-list__main">
-                          <strong>
-                            <Link href={`/market/${post.id}`}>{post.title}</Link>
-                          </strong>
-                          <div className="market-table__meta">
-                            {post.createdAt} · {post.game} · {post.server} · {post.quantity}
-                          </div>
-                        </div>
-                        <div className="seller-stats">
-                          <span>{getTradeTypeLabel(post.tradeType)}</span>
-                          <span>{getStatusLabel(post.status)}</span>
-                          <span>댓글 {post.commentCount}</span>
-                          <span>{post.price}</span>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="empty-state">
-                    <strong>선택한 조건에 맞는 게시글이 없습니다.</strong>
-                    <p>다른 월을 선택하거나 회원을 다시 선택해 주세요.</p>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="empty-state">
-                <strong>회원 목록에서 대상을 선택해 주세요.</strong>
-                <p>선택 후 월별 게시글 조회와 CSV export가 활성화됩니다.</p>
-              </div>
-            )}
           </section>
         </div>
       </section>
