@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Noto_Sans_KR, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { AdSidebar } from "../components/AdSidebar";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import { ImpersonationBanner } from "../components/ImpersonationBanner";
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ImpersonationBanner />
         <Header />
         {children}
+        <AdSidebar />
         <Footer />
       </body>
     </html>

@@ -2481,6 +2481,110 @@ label,
 }
 
 /* ════════════════════════════════════════════════════════════════ */
+/* 광고 영역 placeholder (sponsored sidebar) — 일반 사용자 페이지 우측 */
+/* ════════════════════════════════════════════════════════════════ */
+
+.ad-sidebar {
+  display: none; /* viewport gate: 1500px+ 에서만 표시 */
+  position: fixed;
+  right: 24px;
+  top: 96px;
+  z-index: 5;
+  flex-direction: column;
+  gap: 16px;
+  width: 300px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 1500px) {
+  .ad-sidebar {
+    display: flex;
+  }
+}
+
+.ad-sidebar__heading {
+  margin: 0;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  align-self: start;
+}
+
+.ad-sidebar__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px;
+  border: 1px dashed rgba(15, 23, 42, 0.18);
+  border-radius: 16px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(15, 23, 42, 0.03),
+      rgba(15, 23, 42, 0.03) 10px,
+      rgba(15, 23, 42, 0.06) 10px,
+      rgba(15, 23, 42, 0.06) 20px
+    ),
+    rgba(255, 255, 255, 0.6);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ad-sidebar__slot-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.ad-sidebar__slot strong {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.ad-sidebar__slot-size {
+  font-size: 0.84rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.ad-sidebar__slot-note {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 8px;
+  padding: 0 8px;
+  line-height: 1.4;
+}
+
+.ad-sidebar__footer {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 6px 0;
+  font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════ */
 /* STAFF CONSOLE — /staff 라우트에서만 사용. 일반 사이트 chrome과 분리. */
 /* ════════════════════════════════════════════════════════════════ */
 
