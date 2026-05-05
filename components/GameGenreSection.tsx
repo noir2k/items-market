@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GameHubCard } from "./GameHubCard";
 import type { GameBoardStat, GameGenre } from "../lib/types";
 
@@ -5,6 +6,12 @@ interface GameGenreSectionProps {
   genre: GameGenre;
   stats: GameBoardStat[];
 }
+
+/**
+ * 4×3 = 12 cells. 게임 수가 11 이하면 그대로, 12개 이상이면 11 카드 + 1 "더보기" 카드를
+ * 마지막 자리에 배치하여 장르 전체보기 페이지로 link.
+ */
+const MAX_GAME_CARDS = 11;
 
 const GENRE_LABELS: Record<GameGenre, { eyebrow: string; title: string; description?: string }> = {
   mmorpg_pc: {
@@ -66,18 +73,36 @@ export const GENRE_DISPLAY_ORDER: GameGenre[] = [
 
 export function GameGenreSection({ genre, stats }: GameGenreSectionProps) {
   const meta = GENRE_LABELS[genre];
+  const showMoreCard = stats.length > MAX_GAME_CARDS;
+  const visibleStats = showMoreCard ? stats.slice(0, MAX_GAME_CARDS) : stats;
+  const hiddenCount = stats.length - visibleStats.length;
 
   return (
     <section className="genre-section">
       <header className="genre-section__head">
         <p className="eyebrow">{meta.eyebrow}</p>
-        <h2>{meta.title}</h2>
+        <h2>
+          {meta.title}
+          <span className="genre-section__count"> · {stats.length.toLocaleString("ko-KR")}개 게임</span>
+        </h2>
         {meta.description ? <p className="muted">{meta.description}</p> : null}
       </header>
       <div className="game-hub-grid">
-        {stats.map((stat) => (
+        {visibleStats.map((stat) => (
           <GameHubCard key={stat.game.slug} stat={stat} />
         ))}
+        {showMoreCard ? (
+          <Link className="game-hub-card game-hub-card--more" href={`/market/genre/${genre}`}>
+            <div className="game-hub-card__head">
+              <span aria-hidden="true" className="game-hub-card__icon game-hub-card__icon--placeholder">+</span>
+              <strong className="game-hub-card__name">+{hiddenCount.toLocaleString("ko-KR")}개 더 보기</strong>
+              <span aria-hidden="true" className="game-hub-card__cta">→</span>
+            </div>
+            <div className="game-hub-card__metric">
+              <span>{meta.title} 전체 게시판</span>
+            </div>
+          </Link>
+        ) : null}
       </div>
     </section>
   );

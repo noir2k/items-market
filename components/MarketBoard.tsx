@@ -44,7 +44,10 @@ export function MarketBoard({
   initialServer,
   initialStatus,
   initialTradeType,
-  posts
+  loadMoreHref,
+  loadMoreIncrement,
+  posts,
+  totalCount
 }: {
   games: BoardGame[];
   initialCategory?: string;
@@ -53,7 +56,13 @@ export function MarketBoard({
   initialServer?: string;
   initialStatus?: string;
   initialTradeType?: string;
+  /** 다음 SSR 페이지 URL (null이면 더 이상 없음) */
+  loadMoreHref?: string | null;
+  /** 다음 클릭 시 로드되는 추가 건수 — 라벨용 */
+  loadMoreIncrement?: number;
   posts: MarketPost[];
+  /** SSR 단계 totalCount — 클라이언트 필터와 무관한 진짜 총합 */
+  totalCount?: number;
 }) {
   const router = useRouter();
   const [tradeType, setTradeTypeState] = useState<TradeTypeFilter>(
@@ -231,6 +240,19 @@ export function MarketBoard({
               <p>필터 조건을 바꾸거나 새 거래 글을 등록해 주세요.</p>
             </div>
           )}
+
+          {/* "더 보기" — SSR 페이징. 클라이언트 필터로 일부가 가려진 상태여도 더 많은
+              게시글이 SQL에 남아 있으면 노출. (totalCount는 SSR 기준) */}
+          {loadMoreHref && totalCount !== undefined ? (
+            <div className="board-load-more">
+              <Link className="button button--light button--full" href={loadMoreHref}>
+                + {(loadMoreIncrement ?? 30).toLocaleString("ko-KR")}건 더 보기
+                <span className="board-load-more__progress">
+                  ({posts.length.toLocaleString("ko-KR")} / {totalCount.toLocaleString("ko-KR")})
+                </span>
+              </Link>
+            </div>
+          ) : null}
         </section>
     </div>
   );

@@ -812,9 +812,70 @@ label,
   letter-spacing: -0.01em;
 }
 
+.genre-section__count {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+
 .genre-section__head p.muted {
   margin: 0;
   font-size: 0.92rem;
+}
+
+/* "더 보기" 버튼 — 게임 보드 페이지 게시글 누적 로드 */
+.board-load-more {
+  margin-top: var(--space-5);
+}
+
+.board-load-more .button {
+  border-style: dashed;
+  border-color: var(--line);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.86);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.board-load-more .button:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.board-load-more__progress {
+  margin-left: 8px;
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+/* "더보기" placeholder 카드 — 12+ 게임 시 마지막 자리에 노출 */
+.game-hub-card--more {
+  background: linear-gradient(135deg, var(--surface-muted) 0%, rgba(255, 255, 255, 0.6) 100%);
+  border-style: dashed;
+  border-color: var(--line);
+}
+
+.game-hub-card--more:hover {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary-soft) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+.game-hub-card--more .game-hub-card__icon--placeholder {
+  background: rgba(37, 99, 235, 0.10);
+  color: var(--primary);
+  font-size: 1.6rem;
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.game-hub-card--more .game-hub-card__name {
+  color: var(--primary);
+}
+
+.game-hub-card--more .game-hub-card__metric {
+  border-top-color: rgba(37, 99, 235, 0.15);
 }
 
 /* Game Hub — landing grid on /market */

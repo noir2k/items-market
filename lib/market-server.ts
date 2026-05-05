@@ -144,6 +144,21 @@ export async function listMarketPosts(): Promise<MarketPost[]> {
 }
 
 export async function listMarketPostsByGameSlug(slug: string): Promise<MarketPost[]> {
+  // 호환 유지: 전체 fetch가 필요한 곳(예: 검색/필터 in-memory)을 위해 남겨둠.
+  // 신규 페이지는 listMarketPostsByGameSlugLimited 사용.
+  const { posts } = await listMarketPostsByGameSlugLimited(slug, Number.MAX_SAFE_INTEGER);
+  return posts;
+}
+
+/**
+ * 게임 보드 페이지용 SSR 페이징.
+ * `show` 만큼만 fetch + count: 'exact' 으로 totalCount 반환 → "더 보기" 버튼이
+ * `?show=show+30`으로 navigate하면 한 번 더 SSR하여 누적 표시.
+ */
+export async function listMarketPostsByGameSlugLimited(
+  slug: string,
+  limit: number
+): Promise<{ posts: MarketPost[]; totalCount: number }> {
   const supabase = await createClient();
   const { data: gameRow, error: gameError } = await supabase
     .from("games")
@@ -152,21 +167,26 @@ export async function listMarketPostsByGameSlug(slug: string): Promise<MarketPos
     .single();
 
   if (gameError || !gameRow) {
-    return [];
+    return { posts: [], totalCount: 0 };
   }
 
   const gameId = (gameRow as { id: number }).id;
-  const { data, error } = await supabase
+  const safeLimit = Math.max(1, Math.min(limit, 1000));
+  const { data, error, count } = await supabase
     .from("market_posts")
-    .select(MARKET_POST_LIST_SELECT)
+    .select(MARKET_POST_LIST_SELECT, { count: "exact" })
     .eq("game_id", gameId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(0, safeLimit - 1);
 
   if (error) {
-    return [];
+    return { posts: [], totalCount: 0 };
   }
 
-  return ((data ?? []) as any[]).map((record) => mapMarketPostRecord(normalizeRecordShape(record)));
+  const posts = ((data ?? []) as Array<unknown>).map((record) =>
+    mapMarketPostRecord(normalizeRecordShape(record))
+  );
+  return { posts, totalCount: count ?? posts.length };
 }
 
 export async function listFeaturedMarketPosts(limit = 3): Promise<MarketPost[]> {
@@ -218,34 +238,46 @@ function mapGameRow(row: GameRow): MarketGameOption {
 
 export async function listGameBoardStats(): Promise<GameBoardStat[]> {
   const supabase = await createClient();
-  const [gamesResult, postsResult] = await Promise.all([
+  // 모든 market_posts를 fetch하지 않고 game_post_counts view (GROUP BY)로 28행만 받는다.
+  const [gamesResult, countsResult] = await Promise.all([
     supabase
       .from("games")
       .select("id, slug, name, genre, icon_path")
       .eq("is_active", true)
       .order("sort_order", { ascending: true }),
-    supabase.from("market_posts").select("game_id, status, trade_type")
+    supabase
+      .from("game_post_counts")
+      .select("game_id, total_count, open_count, sell_count, buy_count")
   ]);
 
-  if (gamesResult.error || postsResult.error) {
+  if (gamesResult.error || countsResult.error) {
     return [];
   }
 
   const games = ((gamesResult.data ?? []) as GameRow[]).map(mapGameRow);
-  const posts = (postsResult.data ?? []) as Array<{
-    game_id: number;
-    status: MarketStatus;
-    trade_type: TradeType;
-  }>;
+  const countsByGameId = new Map<number, { buy: number; open: number; sell: number; total: number }>(
+    (
+      (countsResult.data ?? []) as Array<{
+        buy_count: number;
+        game_id: number;
+        open_count: number;
+        sell_count: number;
+        total_count: number;
+      }>
+    ).map((row) => [
+      row.game_id,
+      { buy: row.buy_count, open: row.open_count, sell: row.sell_count, total: row.total_count }
+    ])
+  );
 
   return games.map((game) => {
-    const gamePosts = posts.filter((post) => post.game_id === game.id);
+    const counts = countsByGameId.get(game.id);
     return {
-      buyPosts: gamePosts.filter((post) => post.trade_type === "buy").length,
+      buyPosts: counts?.buy ?? 0,
       game,
-      openPosts: gamePosts.filter((post) => post.status === "open").length,
-      sellPosts: gamePosts.filter((post) => post.trade_type === "sell").length,
-      totalPosts: gamePosts.length
+      openPosts: counts?.open ?? 0,
+      sellPosts: counts?.sell ?? 0,
+      totalPosts: counts?.total ?? 0
     };
   });
 }

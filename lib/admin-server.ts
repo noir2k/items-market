@@ -355,6 +355,96 @@ export async function listAdminPostsPaged({
 }
 
 /**
+ * /staff/members SQL 페이징 — profile_post_summary view 단일 쿼리.
+ * 검색(ilike)/상태/활동(open_post_count·post_count)/게임 slug(array contains) 필터를
+ * SQL 단계에서 처리하고 .range로 페이지 슬라이스 + count: 'exact'으로 totalCount 반환.
+ *
+ * 메모리 페이징 대비 장점:
+ *   - 1k+ 회원 시점에도 SSR fetch가 page size만큼 경량
+ *   - 필터별 totalCount가 SQL 단계에서 정확
+ *   - 인덱스 활용 (search ilike는 인덱스 없으면 seq scan이지만 nickname/email은 작은 컬럼)
+ */
+export async function listAdminMembersPaged({
+  page = 1,
+  pageSize = 20,
+  filter
+}: {
+  page?: number;
+  pageSize?: number;
+  filter: AdminMemberFilter;
+}): Promise<{ members: AdminMemberWithStats[]; totalCount: number }> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("profile_post_summary")
+    .select(
+      "profile_id, post_count, open_post_count, closed_post_count, game_slugs, profile_email, profile_nickname, profile_role, profile_status, profile_created_at",
+      { count: "exact" }
+    )
+    .order("profile_created_at", { ascending: false });
+
+  // 검색 (닉네임 OR 이메일)
+  const search = filter.search?.trim();
+  if (search) {
+    const escaped = search.replace(/[%_,]/g, ""); // PostgREST 안전 처리
+    if (escaped) {
+      query = query.or(
+        `profile_nickname.ilike.%${escaped}%,profile_email.ilike.%${escaped}%`
+      );
+    }
+  }
+
+  if (filter.status === "active" || filter.status === "suspended") {
+    query = query.eq("profile_status", filter.status);
+  }
+
+  if (filter.activity === "trading") {
+    query = query.gt("open_post_count", 0);
+  } else if (filter.activity === "idle") {
+    query = query.eq("post_count", 0);
+  }
+
+  if (filter.gameSlug && filter.gameSlug !== "all") {
+    query = query.contains("game_slugs", [filter.gameSlug]);
+  }
+
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(error.message);
+
+  type Row = {
+    closed_post_count: number;
+    game_slugs: string[];
+    open_post_count: number;
+    post_count: number;
+    profile_created_at: string | null;
+    profile_email: string | null;
+    profile_id: string;
+    profile_nickname: string | null;
+    profile_role: AdminMemberProfile["role"];
+    profile_status: AdminMemberProfile["status"];
+  };
+
+  const members: AdminMemberWithStats[] = ((data ?? []) as Row[]).map((row) => ({
+    closedPostCount: row.closed_post_count,
+    created_at: row.profile_created_at ?? undefined,
+    email: row.profile_email ?? undefined,
+    gameSlugs: row.game_slugs ?? [],
+    id: row.profile_id,
+    nickname: row.profile_nickname ?? undefined,
+    openPostCount: row.open_post_count,
+    postCount: row.post_count,
+    role: row.profile_role,
+    status: row.profile_status
+  }));
+
+  return { members, totalCount: count ?? 0 };
+}
+
+/**
  * 회원 1명의 최근 게시글 (인라인 detail용). 기본 limit 20건.
  * month YYYY-MM가 주어지면 해당 월로 한정.
  */

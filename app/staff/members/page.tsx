@@ -7,15 +7,15 @@ import { signOutAction } from "../../auth/actions";
 import { impersonateMemberAction, updateMemberStatusAction } from "../actions";
 import { formatMonthOption } from "../../../lib/admin-utils";
 import {
-  filterAdminMembers,
-  getAdminDashboardData,
+  getAdminMemberById,
   listAdminGames,
+  listAdminMembersPaged,
   listMemberPostsRecent,
   type AdminMemberFilter
 } from "../../../lib/admin-server";
 import { getMemberStatusLabel, getRoleLabel, isAdminProfile } from "../../../lib/auth-utils";
 import { getStatusLabel, getTradeTypeLabel } from "../../../lib/market-utils";
-import { getCurrentProfile } from "../../../lib/supabase/server";
+import { createClient, getCurrentProfile } from "../../../lib/supabase/server";
 import { getTrustSignalsByIds } from "../../../lib/trust-server";
 import { getTrustBadge } from "../../../lib/trust-utils";
 
@@ -53,13 +53,6 @@ export default async function StaffMembersPage({
   }
 
   const params = await searchParams;
-  // 회원 목록은 메모리 페이지 슬라이스 (Phase 2에서 SQL로 이전 예정 — 1000명+ 시 필요).
-  // 인라인 detail의 게시글은 SQL 단계에서 limit 20.
-  const [dashboard, games] = await Promise.all([
-    getAdminDashboardData({ memberId: null, month: null }),
-    listAdminGames()
-  ]);
-
   const filter: AdminMemberFilter = {
     activity:
       params.activity === "trading" || params.activity === "idle" ? params.activity : "all",
@@ -67,14 +60,19 @@ export default async function StaffMembersPage({
     search: params.search || "",
     status: params.status === "active" || params.status === "suspended" ? params.status : "all"
   };
-  const filteredMembers = filterAdminMembers(dashboard.members, filter);
-  const totalMembers = dashboard.members.length;
-  const totalFiltered = filteredMembers.length;
   const page = parsePage(params.page);
+
+  // SQL 페이징 — profile_post_summary view 사용
+  const supabase = await createClient();
+  const [{ members: pageMembers, totalCount: totalFiltered }, games, totalMembersResult] = await Promise.all([
+    listAdminMembersPaged({ filter, page, pageSize: PAGE_SIZE }),
+    listAdminGames(),
+    supabase.from("profiles").select("id", { count: "exact", head: true })
+  ]);
+  const totalMembers = totalMembersResult.count ?? totalFiltered;
+
   const totalPages = Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const pageMembers = filteredMembers.slice(pageStart, pageStart + PAGE_SIZE);
 
   const trustSignalsByMemberId = await getTrustSignalsByIds(pageMembers.map((member) => member.id));
   const hasActiveFilter =
@@ -83,14 +81,14 @@ export default async function StaffMembersPage({
     filter.activity !== "all" ||
     Boolean(filter.gameSlug);
 
-  // 선택된 회원의 인라인 detail 데이터 — 페이지에 포함된 회원만 의미 있음
-  const selectedMember = params.memberId
-    ? dashboard.members.find((m) => m.id === params.memberId) ?? null
-    : null;
-  const isSelectedInPage = selectedMember
-    ? pageMembers.some((m) => m.id === selectedMember.id)
+  // 선택된 회원의 인라인 detail — memberId가 현재 페이지에 있는 경우만 fetch
+  const isSelectedInPage = params.memberId
+    ? pageMembers.some((m) => m.id === params.memberId)
     : false;
-  const memberDetail = selectedMember && isSelectedInPage
+  const selectedMember = isSelectedInPage && params.memberId
+    ? await getAdminMemberById(params.memberId)
+    : null;
+  const memberDetail = selectedMember
     ? await listMemberPostsRecent({
         limit: MEMBER_DETAIL_LIMIT,
         memberId: selectedMember.id,
