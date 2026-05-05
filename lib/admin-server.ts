@@ -193,6 +193,8 @@ interface RawAdminGameRow {
 }
 
 export interface AdminPostFilter {
+  /** 특정 작성자의 게시글만 (회원 상세 → 전체 보기 흐름) */
+  authorId?: string | null;
   gameSlug?: string | null;
   genre?: GameGenre | null;
   status?: "open" | "closed" | "all" | null;
@@ -341,6 +343,9 @@ export async function listAdminPostsPaged({
   }
   if (filter?.status === "open" || filter?.status === "closed") {
     query = query.eq("status", filter.status);
+  }
+  if (filter?.authorId) {
+    query = query.eq("author_id", filter.authorId);
   }
 
   query = query.range(from, to);

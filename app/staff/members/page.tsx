@@ -372,10 +372,8 @@ export default async function StaffMembersPage({
                             </button>
                             <Link
                               className="button button--light"
-                              href={`/staff/posts?game=all&genre=all&status=all&authorPreview=${encodeURIComponent(
-                                selectedMember.nickname || ""
-                              )}`}
-                              title="해당 회원의 게시글을 전체 보기 (관리 액션 가능)"
+                              href={`/staff/posts?author=${encodeURIComponent(selectedMember.id)}`}
+                              title="해당 회원의 게시글을 페이징/거래완료/삭제 등 전체 관리 액션과 함께 보기"
                             >
                               전체 게시글 보기 →
                             </Link>

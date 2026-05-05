@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Pagination } from "../../../components/Pagination";
 import { adminCloseMarketPostAction, adminDeleteMarketPostAction } from "../actions";
 import {
+  getAdminMemberById,
   listAdminGames,
   listAdminPostsPaged
 } from "../../../lib/admin-server";
@@ -50,6 +51,7 @@ export default async function StaffPostsPage({
   searchParams
 }: {
   searchParams: Promise<{
+    author?: string;
     error?: string;
     game?: string;
     genre?: string;
@@ -72,11 +74,16 @@ export default async function StaffPostsPage({
     params.genre && GENRE_OPTIONS.includes(params.genre as GameGenre)
       ? (params.genre as GameGenre)
       : null;
+  const filterAuthorId = params.author?.trim() || null;
   const page = parsePage(params.page);
+
+  // author 닉네임 lookup (필터 라벨 노출용) — 잘못된 ID는 그대로 두고 결과 0건 표시
+  const authorMember = filterAuthorId ? await getAdminMemberById(filterAuthorId) : null;
 
   const [{ posts, totalCount }, games] = await Promise.all([
     listAdminPostsPaged({
       filter: {
+        authorId: filterAuthorId,
         gameSlug: filterGameSlug,
         genre: filterGenre,
         status: filterStatus
@@ -92,6 +99,7 @@ export default async function StaffPostsPage({
     if (filterStatus !== "all") next.set("status", filterStatus);
     if (filterGameSlug) next.set("game", filterGameSlug);
     if (filterGenre) next.set("genre", filterGenre);
+    if (filterAuthorId) next.set("author", filterAuthorId);
     if (page !== 1) next.set("page", String(page));
     for (const [key, value] of Object.entries(overrides)) {
       if (value === null) {
@@ -107,6 +115,7 @@ export default async function StaffPostsPage({
   const buildPageHref = (nextPage: number) => buildHref({ page: nextPage === 1 ? null : String(nextPage) });
 
   const filterContextLabel = [
+    authorMember ? `${authorMember.nickname || authorMember.email} 작성자` : null,
     filterGameSlug ? games.find((g) => g.slug === filterGameSlug)?.name : null,
     filterGenre ? GENRE_LABELS[filterGenre] : null,
     filterStatus !== "all" ? (filterStatus === "open" ? "거래중" : "거래완료") : null
@@ -146,12 +155,36 @@ export default async function StaffPostsPage({
                 <p className="eyebrow">FILTER</p>
                 <h2>필터</h2>
               </div>
-              {(filterGameSlug || filterGenre || filterStatus !== "all") ? (
+              {(filterGameSlug || filterGenre || filterStatus !== "all" || filterAuthorId) ? (
                 <Link className="text-link" href="/staff/posts">
                   필터 초기화 ×
                 </Link>
               ) : null}
             </div>
+
+            {/* 회원 상세 → 전체 게시글 보기로 진입한 경우 작성자 필터 칩 노출 */}
+            {filterAuthorId ? (
+              <div className="board-active-filters">
+                {authorMember ? (
+                  <span className="chip chip--muted">
+                    작성자: <strong>{authorMember.nickname || authorMember.email}</strong>
+                  </span>
+                ) : (
+                  <span className="chip chip--muted">작성자: 알 수 없음 ({filterAuthorId.slice(0, 8)}…)</span>
+                )}
+                <Link className="text-link" href={buildHref({ author: null, page: null })}>
+                  작성자 필터 해제 ×
+                </Link>
+                {authorMember ? (
+                  <Link
+                    className="text-link"
+                    href={`/staff/members?memberId=${encodeURIComponent(authorMember.id)}#member-row-${encodeURIComponent(authorMember.id)}`}
+                  >
+                    회원 상세로 →
+                  </Link>
+                ) : null}
+              </div>
+            ) : null}
 
             <form action="/staff/posts" className="board-toolbar board-toolbar--admin" method="get">
               <label className="field">
@@ -184,7 +217,8 @@ export default async function StaffPostsPage({
                   <option value="closed">거래완료</option>
                 </select>
               </label>
-              {/* 필터 변경 시 페이지는 1로 초기화 (page input 미포함) */}
+              {/* 필터 변경 시 페이지는 1로 초기화 (page input 미포함). author는 form 외 chip으로 관리. */}
+              {filterAuthorId ? <input name="author" type="hidden" value={filterAuthorId} /> : null}
               <div className="admin-filter-actions">
                 <button className="button button--dark" type="submit">
                   필터 적용
