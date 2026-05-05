@@ -20,6 +20,45 @@ export interface AdminMemberWithStats extends AdminMemberProfile {
   closedPostCount: number;
   openPostCount: number;
   postCount: number;
+  /** 회원이 1건 이상 작성한 게임 slug 집합 — 게임별 필터/표시에 사용 */
+  gameSlugs: string[];
+}
+
+export interface AdminMemberFilter {
+  /** 닉네임/이메일 substring (대소문자 무시) */
+  search?: string | null;
+  status?: "all" | "active" | "suspended" | null;
+  /** 활동 분류 — trading: 거래중 글 1건+, idle: 게시글 0, all: 무관 */
+  activity?: "all" | "trading" | "idle" | null;
+  /** 회원이 게시글을 올린 게임 slug. 'all' 또는 null이면 무관 */
+  gameSlug?: string | null;
+}
+
+export function filterAdminMembers(
+  members: AdminMemberWithStats[],
+  filter: AdminMemberFilter
+): AdminMemberWithStats[] {
+  const search = filter.search?.trim().toLowerCase() || "";
+
+  return members.filter((member) => {
+    if (search) {
+      const haystack = `${member.nickname || ""} ${member.email || ""}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+
+    if (filter.status && filter.status !== "all") {
+      if (member.status !== filter.status) return false;
+    }
+
+    if (filter.activity === "trading" && member.openPostCount === 0) return false;
+    if (filter.activity === "idle" && member.postCount > 0) return false;
+
+    if (filter.gameSlug && filter.gameSlug !== "all") {
+      if (!member.gameSlugs.includes(filter.gameSlug)) return false;
+    }
+
+    return true;
+  });
 }
 
 export async function requireAdminAccess() {
@@ -74,32 +113,45 @@ export async function getAdminDashboardData({
   month?: string | null;
 }) {
   const [members, posts] = await Promise.all([listAdminMembers(), listMarketPosts()]);
-  const statsByMemberId = posts.reduce<Record<string, { closedPostCount: number; openPostCount: number; postCount: number }>>(
-    (accumulator, post) => {
-      const key = post.authorId || "unknown";
-      const current = accumulator[key] || {
+
+  interface MemberAggregate {
+    closedPostCount: number;
+    gameSlugSet: Set<string>;
+    openPostCount: number;
+    postCount: number;
+  }
+
+  const aggregateByMemberId = posts.reduce<Record<string, MemberAggregate>>((accumulator, post) => {
+    const key = post.authorId || "unknown";
+    const current =
+      accumulator[key] ||
+      ({
         closedPostCount: 0,
+        gameSlugSet: new Set<string>(),
         openPostCount: 0,
         postCount: 0
-      };
+      } as MemberAggregate);
 
-      current.postCount += 1;
-      current.openPostCount += post.status === "open" ? 1 : 0;
-      current.closedPostCount += post.status === "closed" ? 1 : 0;
-      accumulator[key] = current;
-      return accumulator;
-    },
-    {}
-  );
+    current.postCount += 1;
+    current.openPostCount += post.status === "open" ? 1 : 0;
+    current.closedPostCount += post.status === "closed" ? 1 : 0;
+    if (post.gameSlug) {
+      current.gameSlugSet.add(post.gameSlug);
+    }
+    accumulator[key] = current;
+    return accumulator;
+  }, {});
 
-  const membersWithStats: AdminMemberWithStats[] = members.map((member) => ({
-    ...member,
-    ...(statsByMemberId[member.id] || {
-      closedPostCount: 0,
-      openPostCount: 0,
-      postCount: 0
-    })
-  }));
+  const membersWithStats: AdminMemberWithStats[] = members.map((member) => {
+    const aggregate = aggregateByMemberId[member.id];
+    return {
+      ...member,
+      closedPostCount: aggregate?.closedPostCount ?? 0,
+      gameSlugs: aggregate ? Array.from(aggregate.gameSlugSet).sort() : [],
+      openPostCount: aggregate?.openPostCount ?? 0,
+      postCount: aggregate?.postCount ?? 0
+    };
+  });
 
   const summary = getAdminSummary({
     members,

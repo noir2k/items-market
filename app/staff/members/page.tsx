@@ -4,7 +4,12 @@ import { TrustBadge } from "../../../components/TrustBadge";
 import { signOutAction } from "../../auth/actions";
 import { impersonateMemberAction, updateMemberStatusAction } from "../actions";
 import { formatMonthOption } from "../../../lib/admin-utils";
-import { getAdminDashboardData } from "../../../lib/admin-server";
+import {
+  filterAdminMembers,
+  getAdminDashboardData,
+  listAdminGames,
+  type AdminMemberFilter
+} from "../../../lib/admin-server";
 import { getMemberStatusLabel, getRoleLabel, isAdminProfile } from "../../../lib/auth-utils";
 import { getStatusLabel, getTradeTypeLabel } from "../../../lib/market-utils";
 import { getCurrentProfile } from "../../../lib/supabase/server";
@@ -19,10 +24,14 @@ export default async function StaffMembersPage({
   searchParams
 }: {
   searchParams: Promise<{
+    activity?: string;
     error?: string;
+    game?: string;
     memberId?: string;
     message?: string;
     month?: string;
+    search?: string;
+    status?: string;
   }>;
 }) {
   const { profile, user } = await getCurrentProfile();
@@ -32,11 +41,29 @@ export default async function StaffMembersPage({
   }
 
   const params = await searchParams;
-  const dashboard = await getAdminDashboardData({
-    memberId: params.memberId || null,
-    month: params.month || null
-  });
-  const trustSignalsByMemberId = await getTrustSignalsByIds(dashboard.members.map((member) => member.id));
+  const [dashboard, games] = await Promise.all([
+    getAdminDashboardData({
+      memberId: params.memberId || null,
+      month: params.month || null
+    }),
+    listAdminGames()
+  ]);
+
+  const filter: AdminMemberFilter = {
+    activity:
+      params.activity === "trading" || params.activity === "idle" ? params.activity : "all",
+    gameSlug: params.game && params.game !== "all" ? params.game : null,
+    search: params.search || "",
+    status: params.status === "active" || params.status === "suspended" ? params.status : "all"
+  };
+  const filteredMembers = filterAdminMembers(dashboard.members, filter);
+  const totalMembers = dashboard.members.length;
+  const trustSignalsByMemberId = await getTrustSignalsByIds(filteredMembers.map((member) => member.id));
+  const hasActiveFilter =
+    Boolean(filter.search) ||
+    filter.status !== "all" ||
+    filter.activity !== "all" ||
+    Boolean(filter.gameSlug);
 
   return (
     <main>
@@ -63,17 +90,92 @@ export default async function StaffMembersPage({
             </div>
           ) : null}
 
+          {/* ── 필터 폼 ── */}
+          <section className="panel">
+            <div className="section-heading section-heading--compact">
+              <div>
+                <p className="eyebrow">FILTER</p>
+                <h2>검색 / 필터</h2>
+              </div>
+              {hasActiveFilter ? (
+                <Link className="text-link" href="/staff/members">
+                  필터 초기화 ×
+                </Link>
+              ) : null}
+            </div>
+
+            <form action="/staff/members" className="board-toolbar board-toolbar--admin" method="get">
+              <label className="field">
+                <span>회원 검색</span>
+                <input
+                  defaultValue={filter.search || ""}
+                  name="search"
+                  placeholder="닉네임 또는 이메일"
+                  type="search"
+                />
+              </label>
+              <label className="field">
+                <span>상태</span>
+                <select defaultValue={filter.status || "all"} name="status">
+                  <option value="all">전체 상태</option>
+                  <option value="active">활성</option>
+                  <option value="suspended">정지</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>거래 활동</span>
+                <select defaultValue={filter.activity || "all"} name="activity">
+                  <option value="all">전체</option>
+                  <option value="trading">거래중 (open ≥ 1)</option>
+                  <option value="idle">비활성 (게시글 0)</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>거래 게임</span>
+                <select defaultValue={filter.gameSlug || "all"} name="game">
+                  <option value="all">전체 게임</option>
+                  {games.map((game) => (
+                    <option key={game.slug} value={game.slug}>
+                      {game.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {/* 필터 적용 시 선택된 회원 컨텍스트는 유지 (월별 export 흐름 보존) */}
+              {params.memberId ? <input name="memberId" type="hidden" value={params.memberId} /> : null}
+              {params.month ? <input name="month" type="hidden" value={params.month} /> : null}
+              <div className="admin-filter-actions">
+                <button className="button button--dark" type="submit">
+                  필터 적용
+                </button>
+              </div>
+            </form>
+          </section>
+
           <section className="panel">
             <div className="section-heading section-heading--compact">
               <div>
                 <p className="eyebrow">LIST</p>
-                <h2>회원 목록 ({dashboard.members.length}명)</h2>
+                <h2>
+                  회원 목록 ({filteredMembers.length}명
+                  {hasActiveFilter && filteredMembers.length !== totalMembers
+                    ? ` / 전체 ${totalMembers}명`
+                    : ""}
+                  )
+                </h2>
               </div>
               <span className="muted">회원 선택 시 월별 게시글 조회와 export가 활성화됩니다.</span>
             </div>
 
+            {filteredMembers.length === 0 ? (
+              <div className="empty-state">
+                <strong>해당 조건의 회원이 없습니다.</strong>
+                <p>다른 키워드/조건으로 다시 시도해 주세요.</p>
+              </div>
+            ) : null}
+
             <div className="admin-list">
-              {dashboard.members.map((member) => {
+              {filteredMembers.map((member) => {
                 const trust = trustSignalsByMemberId[member.id];
                 const trustBadge = trust && member.role
                   ? getTrustBadge({
