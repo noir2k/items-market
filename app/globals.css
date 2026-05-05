@@ -405,6 +405,7 @@ label,
 
 .hero__content,
 .search-panel,
+.hero-feature,
 .panel,
 .category-card,
 .listing-card,
@@ -546,6 +547,265 @@ label,
   display: grid;
   gap: var(--space-3);
   margin-top: 22px;
+}
+
+/* ════════════════════════════════════════════════════════════════ */
+/* Hero feature panel (메인 페이지 우측) — 인기 게임 + 라이브 피드     */
+/* ════════════════════════════════════════════════════════════════ */
+
+.hero-feature {
+  border-radius: 36px;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.hero-feature__divider {
+  height: 1px;
+  background: var(--line);
+  margin: 0 calc(-1 * var(--space-6));
+}
+
+.hero-feature__more {
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--line);
+}
+
+.hero-feature__more:hover {
+  text-decoration: underline;
+}
+
+/* ── A: 인기 게임 수평 strip ── */
+.hero-feature__games {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hero-feature__games .eyebrow {
+  margin: 0;
+}
+
+.hero-feature__game-strip {
+  display: flex;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hero-feature__game-strip::-webkit-scrollbar {
+  height: 6px;
+}
+.hero-feature__game-strip::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
+}
+
+.hero-feature__game-strip li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.hero-feature__game-strip a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2);
+  border-radius: 14px;
+  width: 78px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.hero-feature__game-strip a:hover {
+  background: var(--surface-muted);
+  transform: translateY(-2px);
+}
+
+.hero-feature__game-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.hero-feature__game-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-feature__game-icon-placeholder {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.hero-feature__game-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
+.hero-feature__game-count {
+  font-size: 0.7rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ── B: 라이브 피드 vertical carousel ── */
+.hero-feature__live {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hero-feature__live-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.hero-feature__live-dot {
+  color: #ef4444;
+  font-size: 0.6rem;
+  animation: hero-live-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes hero-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.hero-feature__live-head strong {
+  color: #ef4444;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.hero-feature__live-track {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface-muted);
+}
+
+.hero-feature__live-stack {
+  display: flex;
+  flex-direction: column;
+  transition: transform 600ms var(--ease-out);
+}
+
+.hero-feature__live-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  text-decoration: none;
+  color: var(--text);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.hero-feature__live-card:hover {
+  background: var(--primary-soft);
+}
+
+.hero-feature__live-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.hero-feature__live-icon--placeholder {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.hero-feature__live-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.hero-feature__live-body strong {
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-feature__live-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-feature__live-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hero-feature__live-dot-btn {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: var(--line);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), width var(--duration-fast) var(--ease-out);
+}
+
+.hero-feature__live-dot-btn.is-active {
+  background: var(--primary);
+  width: 18px;
+  border-radius: 3px;
+}
+
+.hero-feature__live--empty p {
+  margin: 0;
+  text-align: center;
+  padding: var(--space-4);
 }
 
 .tabs {

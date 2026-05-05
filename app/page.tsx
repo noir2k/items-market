@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { HeroFeaturePanel } from "../components/HeroFeaturePanel";
 import { ListingGrid } from "../components/ListingGrid";
-import { HeroSearchCard } from "../components/HeroSearchCard";
 import { listFeaturedMarketPosts } from "../lib/market-server";
 
 const categories = [
@@ -74,7 +74,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <HeroSearchCard />
+          <HeroFeaturePanel />
         </div>
       </section>
 
