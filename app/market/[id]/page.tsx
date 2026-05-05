@@ -6,13 +6,43 @@ import {
   deleteMarketPostAction
 } from "../actions";
 import { isAdminProfile } from "../../../lib/auth-utils";
-import { getMarketPostById } from "../../../lib/market-server";
+import { getMarketPostById, listCommentsByPostId } from "../../../lib/market-server";
 import { canManageMarketPost, getStatusLabel, getTradeTimeline, getTradeTypeLabel } from "../../../lib/market-utils";
 import { getCurrentProfile } from "../../../lib/supabase/server";
 import { getTrustSignal } from "../../../lib/trust-server";
 import { getActivityLabel, getMembershipLabel, getSuccessRate, getTrustBadge } from "../../../lib/trust-utils";
 import { TrustBadge } from "../../../components/TrustBadge";
 import { TradeTimeline } from "../../../components/TradeTimeline";
+
+const COMMENT_INITIAL_SHOW = 20;
+const COMMENT_SHOW_INCREMENT = 20;
+const COMMENT_SHOW_HARD_CAP = 500;
+
+function parseCommentShow(raw: string | undefined): number {
+  const n = Number.parseInt(raw || "", 10);
+  if (!Number.isFinite(n) || n <= 0) return COMMENT_INITIAL_SHOW;
+  return Math.min(COMMENT_SHOW_HARD_CAP, n);
+}
+
+function formatCommentTime(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString("ko-KR", {
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function getCommentLabel(commentType: string): string {
+  if (commentType === "offer") return "제안";
+  if (commentType === "system") return "시스템";
+  return "문의";
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -35,16 +65,25 @@ export default async function ListingDetailPage({
   searchParams
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{ commentShow?: string; error?: string; message?: string }>;
 }) {
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
-  const item = await getMarketPostById(id);
-  const { profile, user } = await getCurrentProfile();
+  const commentShow = parseCommentShow(resolvedSearchParams.commentShow);
+  const [item, { comments: pagedComments, totalCount: totalCommentCount }, { profile, user }] = await Promise.all([
+    getMarketPostById(id),
+    listCommentsByPostId(id, commentShow),
+    getCurrentProfile()
+  ]);
 
   if (!item) {
     notFound();
   }
+
+  // SQL 페이징 결과로 item.comments 덮어쓰기 (UI 렌더는 paged set만 사용)
+  const olderHidden = Math.max(0, totalCommentCount - pagedComments.length);
+  const nextCommentShow = Math.min(COMMENT_SHOW_HARD_CAP, commentShow + COMMENT_SHOW_INCREMENT);
+  const loadMoreOlderHref = olderHidden > 0 ? `/market/${item.id}?commentShow=${nextCommentShow}` : null;
 
   const canManage = canManageMarketPost({
     authorId: item.authorId || "",
@@ -209,17 +248,35 @@ export default async function ListingDetailPage({
             </div>
 
             <div className="detail-box">
-              <h3>거래 댓글</h3>
+              <h3>
+                거래 댓글
+                {totalCommentCount > 0 ? (
+                  <span className="comment-list__count"> · {totalCommentCount.toLocaleString("ko-KR")}건</span>
+                ) : null}
+              </h3>
+
+              {/* 이전 댓글 더 보기 — 최신 N개만 SSR로 가져왔고 그 이전이 더 있으면 노출 */}
+              {loadMoreOlderHref ? (
+                <div className="comment-list__load-older">
+                  <Link className="button button--light" href={loadMoreOlderHref} scroll={false}>
+                    ↑ 이전 댓글 {Math.min(COMMENT_SHOW_INCREMENT, olderHidden).toLocaleString("ko-KR")}건 더 보기
+                    <span className="board-load-more__progress">
+                      ({pagedComments.length} / {totalCommentCount})
+                    </span>
+                  </Link>
+                </div>
+              ) : null}
+
               <div className="comment-list">
-                {item.comments.length > 0 ? (
-                  item.comments.map((comment) => (
+                {pagedComments.length > 0 ? (
+                  pagedComments.map((comment) => (
                     <article className="comment-card" key={comment.id}>
                       <div className="comment-card__top">
-                        <strong>{comment.author}</strong>
-                        <span className="chip chip--muted">{comment.label}</span>
+                        <strong>{comment.author || "(알 수 없음)"}</strong>
+                        <span className="chip chip--muted">{getCommentLabel(comment.commentType)}</span>
                       </div>
-                      <p>{comment.message}</p>
-                      <span className="muted">{comment.createdAt}</span>
+                      <p>{comment.content}</p>
+                      <span className="muted">{formatCommentTime(comment.createdAtIso)}</span>
                     </article>
                   ))
                 ) : (

@@ -11,6 +11,7 @@ import {
   type MarketCategoryFilterCode
 } from "../lib/market-utils";
 import type { MarketPost, MarketStatus, TradeType } from "../lib/types";
+import { LoadMoreButton } from "./LoadMoreButton";
 import { MarketTable } from "./MarketTable";
 
 type TradeTypeFilter = TradeType | "all";
@@ -242,16 +243,16 @@ export function MarketBoard({
           )}
 
           {/* "더 보기" — SSR 페이징. 클라이언트 필터로 일부가 가려진 상태여도 더 많은
-              게시글이 SQL에 남아 있으면 노출. (totalCount는 SSR 기준) */}
+              게시글이 SQL에 남아 있으면 노출. 사용자가 한 번이라도 "더 보기"를 클릭한
+              뒤로는(URL show 파라미터 존재) IntersectionObserver 자동 트리거 ON. */}
           {loadMoreHref && totalCount !== undefined ? (
-            <div className="board-load-more">
-              <Link className="button button--light button--full" href={loadMoreHref}>
-                + {(loadMoreIncrement ?? 30).toLocaleString("ko-KR")}건 더 보기
-                <span className="board-load-more__progress">
-                  ({posts.length.toLocaleString("ko-KR")} / {totalCount.toLocaleString("ko-KR")})
-                </span>
-              </Link>
-            </div>
+            <LoadMoreButton
+              autoLoadWhenInView={posts.length > 30}
+              fetchedCount={posts.length}
+              href={loadMoreHref}
+              increment={loadMoreIncrement ?? 30}
+              totalCount={totalCount}
+            />
           ) : null}
         </section>
     </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { redirect } from "next/navigation";
 import { Pagination } from "../../../components/Pagination";
+import { SearchDebounceInput } from "../../../components/SearchDebounceInput";
 import { TrustBadge } from "../../../components/TrustBadge";
 import { signOutAction } from "../../auth/actions";
 import { impersonateMemberAction, updateMemberStatusAction } from "../actions";
@@ -176,11 +177,11 @@ export default async function StaffMembersPage({
             <form action="/staff/members" className="board-toolbar board-toolbar--admin" method="get">
               <label className="field">
                 <span>회원 검색</span>
-                <input
+                <SearchDebounceInput
                   defaultValue={filter.search || ""}
-                  name="search"
-                  placeholder="닉네임 또는 이메일"
-                  type="search"
+                  paramName="search"
+                  placeholder="닉네임 또는 이메일 (자동 검색)"
+                  resetParams={["page"]}
                 />
               </label>
               <label className="field">

@@ -89,7 +89,7 @@ export function normalizeRecordShape(record: any): MarketPostRecord {
   } as MarketPostRecord;
 }
 
-function parsePostId(id: string): number | null {
+export function parsePostId(id: string): number | null {
   const numericId = Number(id);
 
   if (!Number.isInteger(numericId) || numericId <= 0) {
@@ -97,6 +97,74 @@ function parsePostId(id: string): number | null {
   }
 
   return numericId;
+}
+
+const MARKET_COMMENT_SELECT = `
+  id,
+  comment_type,
+  content,
+  created_at,
+  author:profiles!market_comments_author_id_fkey(nickname)
+`;
+
+/**
+ * /market/[id] 댓글 SQL 페이징 — 최신 N개를 받아 ascending 순서(오래된→최신)로 반환.
+ * 거래 댓글은 채팅처럼 시간순 흐름이라 최신 N개가 대화 맥락. 더 오래된 댓글은
+ * "이전 댓글 더 보기"로 expand.
+ */
+export async function listCommentsByPostId(
+  postIdRaw: string,
+  showLimit = 20
+): Promise<{ comments: Array<{ id: number; author: string | null; commentType: string; content: string; createdAtIso: string }>; firstCommentAtIso: string | null; totalCount: number }> {
+  const postId = parsePostId(postIdRaw);
+  if (!postId) return { comments: [], firstCommentAtIso: null, totalCount: 0 };
+
+  const supabase = await createClient();
+
+  // total count
+  const { count } = await supabase
+    .from("market_comments")
+    .select("id", { count: "exact", head: true })
+    .eq("post_id", postId);
+  const totalCount = count ?? 0;
+
+  if (totalCount === 0) {
+    return { comments: [], firstCommentAtIso: null, totalCount: 0 };
+  }
+
+  // 가장 오래된 댓글 시간 (firstCommentAtIso 용)
+  const { data: firstRow } = await supabase
+    .from("market_comments")
+    .select("created_at")
+    .eq("post_id", postId)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  // 최신 N개 (descending). 화면에는 ascending으로 노출하므로 client에서 reverse.
+  const safeLimit = Math.max(1, Math.min(showLimit, 500));
+  const { data: latestData } = await supabase
+    .from("market_comments")
+    .select(MARKET_COMMENT_SELECT)
+    .eq("post_id", postId)
+    .order("created_at", { ascending: false })
+    .limit(safeLimit);
+
+  const comments = ((latestData ?? []) as any[])
+    .map((row) => ({
+      author: ensureSingle(row.author)?.nickname ?? null,
+      commentType: row.comment_type as string,
+      content: row.content as string,
+      createdAtIso: row.created_at as string,
+      id: row.id as number
+    }))
+    .reverse(); // ascending 화면 노출용
+
+  return {
+    comments,
+    firstCommentAtIso: firstRow?.created_at ?? null,
+    totalCount
+  };
 }
 
 async function runPostQuery(selectClause: string, options?: {
@@ -216,6 +284,32 @@ export async function getMarketPostById(id: string): Promise<MarketPost | null> 
 
 export async function listPostsByAuthor(authorId: string): Promise<MarketPost[]> {
   return runPostQuery(MARKET_POST_LIST_SELECT, { authorId });
+}
+
+/**
+ * /mypage 용 페이징 — SQL .range + count exact.
+ */
+export async function listPostsByAuthorLimited(
+  authorId: string,
+  limit: number
+): Promise<{ posts: MarketPost[]; totalCount: number }> {
+  const supabase = await createClient();
+  const safeLimit = Math.max(1, Math.min(limit, 600));
+  const { data, error, count } = await supabase
+    .from("market_posts")
+    .select(MARKET_POST_LIST_SELECT, { count: "exact" })
+    .eq("author_id", authorId)
+    .order("created_at", { ascending: false })
+    .range(0, safeLimit - 1);
+
+  if (error) {
+    return { posts: [], totalCount: 0 };
+  }
+
+  const posts = ((data ?? []) as Array<unknown>).map((record) =>
+    mapMarketPostRecord(normalizeRecordShape(record))
+  );
+  return { posts, totalCount: count ?? posts.length };
 }
 
 interface GameRow {

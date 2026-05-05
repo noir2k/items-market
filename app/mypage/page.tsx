@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { LoadMoreButton } from "../../components/LoadMoreButton";
 import { MarketTable } from "../../components/MarketTable";
 import { signOutAction } from "../auth/actions";
-import { listPostsByAuthor } from "../../lib/market-server";
-import { getMarketSummary } from "../../lib/market-utils";
+import { listPostsByAuthorLimited } from "../../lib/market-server";
 import { getMemberStatusLabel, getRoleLabel } from "../../lib/auth-utils";
-import { getCurrentProfile } from "../../lib/supabase/server";
+import { createClient, getCurrentProfile } from "../../lib/supabase/server";
 import { getTrustSignal } from "../../lib/trust-server";
 import { getActivityLabel, getMembershipLabel, getSuccessRate, getTrustBadge } from "../../lib/trust-utils";
 import { TrustBadge } from "../../components/TrustBadge";
@@ -14,10 +14,20 @@ export const metadata = {
   title: "마이페이지 | ITEM ODIN"
 };
 
+const INITIAL_SHOW = 20;
+const SHOW_INCREMENT = 20;
+const SHOW_HARD_CAP = 600;
+
+function parseShow(raw: string | undefined): number {
+  const n = Number.parseInt(raw || "", 10);
+  if (!Number.isFinite(n) || n <= 0) return INITIAL_SHOW;
+  return Math.min(SHOW_HARD_CAP, n);
+}
+
 export default async function MyPage({
   searchParams
 }: {
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{ error?: string; message?: string; show?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const { profile, user } = await getCurrentProfile();
@@ -26,11 +36,30 @@ export default async function MyPage({
     redirect("/login?error=" + encodeURIComponent("로그인 후 마이페이지를 이용해 주세요."));
   }
 
-  const [posts, trustSignal] = await Promise.all([
-    listPostsByAuthor(user.id),
-    getTrustSignal(user.id)
+  const show = parseShow(resolvedSearchParams.show);
+  const supabase = await createClient();
+  const [{ posts, totalCount }, trustSignal, summaryRow] = await Promise.all([
+    listPostsByAuthorLimited(user.id, show),
+    getTrustSignal(user.id),
+    // 전체 통계는 view에서 한 번에 — 페이지의 visible posts와 무관
+    supabase
+      .from("profile_post_summary")
+      .select("post_count, open_post_count, closed_post_count")
+      .eq("profile_id", user.id)
+      .maybeSingle()
   ]);
-  const summary = getMarketSummary(posts);
+  const summary = {
+    buyCount: posts.filter((p) => p.tradeType === "buy").length, // 페이지 기준 — 보통 의미 작음
+    closedCount: summaryRow.data?.closed_post_count ?? 0,
+    commentCount: trustSignal?.commentCount ?? 0,
+    openCount: summaryRow.data?.open_post_count ?? 0,
+    sellCount: posts.filter((p) => p.tradeType === "sell").length,
+    totalCount: summaryRow.data?.post_count ?? totalCount
+  };
+  const hasMore = posts.length < totalCount;
+  const nextShow = Math.min(SHOW_HARD_CAP, show + SHOW_INCREMENT);
+  const loadMoreHref = hasMore ? `/mypage?show=${nextShow}` : null;
+  const loadMoreIncrement = Math.min(SHOW_INCREMENT, totalCount - posts.length);
   const trustBadge = trustSignal
     ? getTrustBadge({
         joinedAtIso: trustSignal.joinedAtIso,
@@ -169,7 +198,17 @@ export default async function MyPage({
             </div>
 
             {posts.length > 0 ? (
-              <MarketTable items={posts} />
+              <>
+                <MarketTable items={posts} />
+                {loadMoreHref ? (
+                  <LoadMoreButton
+                    fetchedCount={posts.length}
+                    href={loadMoreHref}
+                    increment={loadMoreIncrement}
+                    totalCount={totalCount}
+                  />
+                ) : null}
+              </>
             ) : (
               <div className="empty-state">
                 <strong>아직 등록한 거래 글이 없습니다.</strong>
