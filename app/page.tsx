@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ListingGrid } from "../components/ListingGrid";
 import { HeroSearchCard } from "../components/HeroSearchCard";
-import { getMarketStats, listFeaturedMarketPosts } from "../lib/market-server";
+import { listFeaturedMarketPosts } from "../lib/market-server";
 
 const categories = [
   {
@@ -26,7 +26,6 @@ const categories = [
   }
 ];
 
-const quickGames = ["메이플스토리", "리니지M", "FC Online", "로스트아크", "던전앤파이터", "아이온"];
 const notices = [
   "서버명 / 캐릭터명 확인 후 거래를 진행해 주세요.",
   "판매 등록 후 상세 댓글로 거래 문의를 받을 수 있습니다.",
@@ -40,11 +39,7 @@ const safetyItems = [
 ];
 
 export default async function HomePage() {
-  const [featuredListings, stats] = await Promise.all([
-    listFeaturedMarketPosts(),
-    getMarketStats()
-  ]);
-  const numberFormatter = new Intl.NumberFormat("ko-KR");
+  const featuredListings = await listFeaturedMarketPosts();
 
   return (
     <main>
@@ -76,32 +71,6 @@ export default async function HomePage() {
               <Link className="button button--light" href="/sell">
                 판매등록
               </Link>
-            </div>
-
-            <div className="hero__stats">
-              <div className="stat">
-                <strong>{numberFormatter.format(stats.openCount)}</strong>
-                <span>거래중 물품</span>
-              </div>
-              <div className="stat">
-                <strong>{numberFormatter.format(stats.totalCount)}</strong>
-                <span>전체 등록 물품</span>
-              </div>
-              <div className="stat">
-                <strong>{numberFormatter.format(stats.closedTodayCount)}</strong>
-                <span>오늘 완료 거래</span>
-              </div>
-            </div>
-
-            <div className="hero-quick">
-              <strong>인기 게임</strong>
-              <div className="chip-row">
-                {quickGames.map((game) => (
-                  <span className="chip" key={game}>
-                    {game}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
 
